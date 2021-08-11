@@ -1,0 +1,42 @@
+.google_signin_button,
+.google_signin_button_light,
+.google_signin_button_dark {
+  width: 191px;
+  height: 46px;
+}
+
+.google_signin_button,
+.google_signin_button_light {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_light_normal_web.png);
+}
+
+.google_signin_button_dark {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_dark_normal_web.png);
+}
+
+.google_signin_button:focus,
+.google_signin_button_light:focus {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_light_focus_web.png);
+}
+
+.google_signin_button_dark:focus {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_dark_focus_web.png);
+}
+
+.google_signin_button:active,
+.google_signin_button_light:active {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_light_pressed_web.png);
+}
+
+.google_signin_button_dark:active {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_dark_pressed_web.png);
+}
+
+.google_signin_button.disabled,
+.google_signin_button_light.disabled {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_light_disabled_web.png);
+}
+
+.google_signin_button_dark.disabled {
+  background-image: url(./images/google_signin_buttons/btn_google_signin_dark_disabled_web.png);
+}

@@ -1,0 +1,42 @@
+.poster {
+  /* calculate height to preserve a 4:3 aspect ratio */
+  --poster-final-width: var(--poster-width, 127px);
+  --poster-final-height: calc(var(--poster-final-width) * (4 / 3));
+
+  position: relative;
+  width: var(--poster-final-width);
+  height: var(--poster-final-height);
+  background-size: var(--poster-final-width) 191px;
+
+  background-color: rgba(0, 0, 0, 0.3);
+
+  background-image: url("https://www.themoviedb.org/t/p/original/b4gYVcl8pParX8AjkN90iQrWrWO.jpg");
+  background-size: contain;
+  background-size: cover;
+  /*background-size: 100%;*/
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.poster.marked::before {
+  content: "";
+  display: block;
+  width: 0px;
+  height: 0px;
+  border-top: 20px solid #ec9329;
+  border-left: 20px solid transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.poster::after {
+  display: block;
+  content: "";
+  width: var(--card-progress, 0);
+  height: 3px;
+  background-color: var(--card-progress-color, #ff0000);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}

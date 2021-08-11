@@ -1,0 +1,27 @@
+[?] split/filter series overview into categories (Comedy, drame sci-fi)
+[ ] Add powered by icons in footer
+[~] Add auth login with email (maybe Facebook and others..)
+[ ] Create Series submition page (Approved/Verified/Moderator auth's are approved right away, unless request is choosen as type, others get pushed to requests)
+[ ] Add button for submitting problem with video/page
+[ ] Add movies
+[ ] Cache some of the results, to reduce number of endpoint calls. (Firebase, YouTube API, ...)
+[ ] Detect sound volume change and save pref. in localstorage/cloud
+[X] Save watch progress when YT video onEnd triggers.
+[ ] Save periodic video watch time locally in localStorage, to prevent inconvenience if crash occurs.
+[ ] Save watch times in the cloud, if Auth.
+[ ] Add notice with local only save, if not auth.
+[ ] (Maybe) add next episode countdown, with optional afk check once in a while
+[ ] Save dates for watchtime, so users can see WHEN they last watched something. (Also good for "order by" if limited number of items need to be shown)
+[ ] Implement start/end time on episodes, to be able to avoid seeing into/credits every episode
+[ ] Improove video page. (see YouTube or Netflix watch page for refference)
+[ ] Add more config file(s) to be able to easily change min watchtime before saving and such.
+[ ] [CSS] implement layouts based on screensize
+[ ] use Youtubes time format (ISO 8601) when saving watchtime
+[X] Resume from last watchtime when going to an episode wideo where watchtime is set
+[ ] Implement "done" watchtime (currently only none or x% is supported)
+[ ] Look into why Firebase document reads is skyhigh currently
+[ ] Some of the firestore need to be re-done @see https://www.youtube.com/watch?v=jm66TSlVtcc
+[ ] context menu should dissapear on hash navigation change.
+[ ] Some sync functionality needed. If data exists in localStorage and in cloud, a dialouge should popup, asking if you wish to sync the data, and how you wish to sync (try to merge, localStorage to cloud, or only cloud)
+[ ] allow fetching/refreshing data from www.thetvdb.com and https://www.themoviedb.org/ for requests, allowing setting poster, and other things.
+[ ] skeleton for when loading posters (see: https://css-tricks.com/building-skeleton-screens-css-custom-properties/)
