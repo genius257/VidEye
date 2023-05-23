@@ -319,9 +319,9 @@ export default function HasAttributes<TBase extends Constructor>(Class: TBase) {
       // and hydrate the relationship's value on the "relationships" array.
       if (
         method_exists(this, $key) ||
-        ((<typeof HasAttributes>this.constructor).$relationResolvers[
+        ((<typeof HasAttributes>this.constructor).$relationResolvers?.[
           get_class(this)
-        ][$key] ??
+        ]?.[$key] ??
           null)
       ) {
         return this.getRelationshipFromMethod($key);
