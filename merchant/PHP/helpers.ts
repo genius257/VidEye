@@ -19,8 +19,9 @@ export function method_exists(obj, method: string): boolean {
   return typeof obj[method] === "function";
 }
 
-export function get_class(obj: Object): string {
-  return obj.constructor.name;
+export function get_class($class): string {
+  $class = typeof $class === "function" ? $class : $class.constructor;
+  return $class.name;
 }
 
 export function class_exists($class): boolean {
@@ -29,4 +30,58 @@ export function class_exists($class): boolean {
 
 export function clone($class) {
   return Object.assign(Object.create(Object.getPrototypeOf($class)), $class);
+}
+
+export function is_trait($class) {
+  // Here we will get the actial class if the provided item is an instance.
+  $class = typeof $class === "function" ? $class : $class.constructor;
+
+  return $class.hasOwnProperty("__trait__");
+}
+
+export function class_parents($class) {
+  // Here we will get the actial class if the provided item is an instance.
+  $class = typeof $class === "function" ? $class : $class.constructor;
+
+  let parents = [];
+  let i = 0;
+  const maxDepth = 255; //A safty thing, to prevent the code from running amok if something unexpected happens with the loop condition.
+  const classPrototype = Object.getPrototypeOf(class {});
+
+  while (Object.getPrototypeOf($class) !== classPrototype) {
+    $class = Object.getPrototypeOf($class);
+    if (!is_trait($class)) {
+      parents.push($class);
+    }
+    if (i++ >= maxDepth) {
+      console.warn("class_parents: maximum depth reached");
+      break;
+    }
+  }
+
+  return parents;
+}
+
+export function class_uses($class) {
+  // Here we will get the actial class if the provided item is an instance.
+  $class = typeof $class === "function" ? $class : $class.constructor;
+
+  let traits = [];
+  let i = 0;
+  const maxDepth = 255; //A safty thing, to prevent the code from running amok if something unexpected happens with the loop condition.
+  const classPrototype = Object.getPrototypeOf(class {});
+
+  while (Object.getPrototypeOf($class) !== classPrototype) {
+    $class = Object.getPrototypeOf($class);
+    if (!is_trait($class)) {
+      break;
+    }
+    traits.push($class);
+    i++;
+    if (i >= maxDepth) {
+      break;
+    }
+  }
+
+  return traits;
 }
