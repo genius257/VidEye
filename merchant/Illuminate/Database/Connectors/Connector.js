@@ -1,6 +1,6 @@
-import JSDO from "../../../JSDO/JSDO";
+import JSDO from "../../../../src/JSDO/JSDO";
 import { isset } from "locutus/php/var";
-import Str from "../../support/Str";
+import Str from "../../Support/Str";
 import { array_diff_key } from "locutus/php/array";
 
 export default class Connector {
