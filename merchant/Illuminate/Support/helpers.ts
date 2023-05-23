@@ -32,6 +32,7 @@ import { basename } from "locutus/php/filesystem";
 import Exception from "../../PHP/Exceptions/Exception";
 import HigherOrderTapProxy from "./HigherOrderTapProxy";
 import Env from "./Env";
+import { class_parents, class_uses, get_class } from "../../PHP/helpers";
 
 interface Json {
   [key: string]: string | number | boolean | Json | Json[];
@@ -99,21 +100,19 @@ export function class_basename($class) {
  * @param  object|string  $class
  * @return array
  */
-export function class_uses_recursive($class):any[] {
-  throw new Error("Not implemented");
-  /*
-        if (is_object($class)) {
-            $class = get_class($class);
-        }
+export function class_uses_recursive($class): any[] {
+  // Here we will get the actial class if the provided item is an instance.
+  $class = typeof $class === "function" ? $class : $class.constructor;
 
-        $results = [];
+  let results = [];
+  class_parents($class)
+    .reverse()
+    .concat([$class])
+    .forEach(($class) => {
+      results.push(...trait_uses_recursive($class));
+    });
 
-        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
-            $results += trait_uses_recursive($class);
-        }
-
-        return array_unique($results);
-        */
+  return results.filter((value, index, self) => self.indexOf(value) === index);
 }
 
 /** Create a collection from the given value. */
@@ -470,17 +469,13 @@ export function throw_unless($condition, $exception, ...$parameters) {
  * @return array
  */
 export function trait_uses_recursive($trait) {
-  throw new Error("Not implemented");
-  /*
   let $traits = class_uses($trait);
 
   for (const [_key, $trait] of Object.entries($traits)) {
-    //FIXME: += in php would add to the array
-    $traits += trait_uses_recursive($trait);
+    $traits.push(...trait_uses_recursive($trait));
   }
 
   return $traits;
-  */
 }
 
 /**
