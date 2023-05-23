@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "@supabase/supabase-js": "2.12.1",
     "firebase": "8.4.1",
     "lockr": "0.8.5",
     "locutus": "2.0.11",
