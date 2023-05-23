@@ -53,7 +53,7 @@ export default function GuardsAttributes<TBase extends Constructor>(
      * @return array
      */
     public getFillable() {
-      return this.fillable;
+      return this.$fillable;
     }
 
     /**
