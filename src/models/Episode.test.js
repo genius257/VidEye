@@ -10,7 +10,7 @@ import FirebaseConnection from "../Database/FirebaseConnection";
 
 it("constructor", () => {
   let episode = new Episode({ title: "anna and the sheep" });
-  expect(episode.title).toBe("anna and the sheep");
+  expect(episode.getAttribute("title")).toBe("anna and the sheep");
 });
 /*
 it("newFromBuilder", () => {
