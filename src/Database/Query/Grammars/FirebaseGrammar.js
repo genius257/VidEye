@@ -109,7 +109,7 @@ export default class FirebaseGrammar extends Grammar {
   compileWheresToArray(query) {
     let $this = this;
     return collect(query.wheres)
-      .map(function(where) {
+      .map(function (where) {
         return where;
         //console.debug(`where${where["type"]}`);
         return (
