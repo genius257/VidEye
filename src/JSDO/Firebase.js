@@ -4,7 +4,6 @@ import "firebase/database";
 import "firebase/firestore";
 import JSDO from "./JSDO";
 import { FirebaseStatement } from "./FirebaseStatement";
-import Exception from "../Illuminate/exceptions/Exception";
 
 export default class Firebase extends JSDO {
   firebase;
