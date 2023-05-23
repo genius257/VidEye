@@ -8,6 +8,7 @@ import {
   array_values
 } from "locutus/php/array";
 import Collection from "./Collection";
+import { instanceofArrayAccess } from "../../PHP/Interfaces/ArrayAccess";
 
 export default class Arr {
   /**
@@ -50,11 +51,9 @@ export default class Arr {
   }
 
   static exists(array, key) {
-    /*
-    if ($array instanceof ArrayAccess) {
-      return array.offsetExists($key);
+    if (instanceofArrayAccess(array)) {
+      return array.offsetExists(key);
     }
-    */
 
     return array_key_exists(key, array);
   }
