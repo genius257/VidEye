@@ -1,4 +1,4 @@
-import Connector from "../../Illuminate/database/connectors/Connector";
+import Connector from "../../../merchant/Illuminate/Database/Connectors/Connector";
 import { empty } from "locutus/php/var";
 import Firebase from "../../JSDO/Firebase";
 

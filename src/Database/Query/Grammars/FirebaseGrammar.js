@@ -1,8 +1,8 @@
-import Grammar from "../../../Illuminate/database/query/grammars/Grammar";
+import Grammar from "../../../../merchant/Illuminate/Database/Query/Grammars/Grammar";
 import { is_null, is_array, isset } from "locutus/php/var";
 import { trim, ucfirst } from "locutus/php/strings";
 import { count } from "locutus/php/array";
-import { collect } from "../../../Illuminate/support/helpers";
+import { collect } from "../../../../merchant/Illuminate/Support/helpers";
 
 //FIXME: firebase firestore does not support specific columns! Either we need to just return it all, or slice the data afterwards
 

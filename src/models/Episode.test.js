@@ -2,7 +2,7 @@ import Episode from "./Episode";
 import Manager from "../../merchant/Illuminate/Database/Capsule/Manager";
 import Connection from "../../merchant/Illuminate/Database/Connection";
 import PDO from "../../merchant/PHP/PDO/PDO";
-import _firebase from "../firebase";
+import _firebase from "../Firebase";
 import JSDO from "../JSDO/JSDO";
 import app from "../bootstrap/app";
 import FirebaseConnector from "../Database/Connectors/FirebaseConnector";
