@@ -40,7 +40,7 @@ import Arrayable, {
 } from "../../../Contracts/Support/Arrayable";
 import { abs } from "locutus/php/math";
 import LogicException from "../../../../PHP/Exceptions/LogicException";
-import { method_exists } from "../../../../PHP/helpers";
+import { get_class, method_exists } from "../../../../PHP/helpers";
 import { Model } from "../Model";
 
 type Constructor<T = {}> = new (...args: any[]) => T;
