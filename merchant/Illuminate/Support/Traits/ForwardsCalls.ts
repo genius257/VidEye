@@ -3,6 +3,8 @@ import { sprintf } from "locutus/php/strings";
 type Constructor<T = {}> = new (...args: any[]) => T;
 export default function ForwardsCalls<TBase extends Constructor>(Class: TBase) {
   return class ForwardsCalls extends Class {
+    static __trait__ = true;
+
     /** Forward a method call to the given object. */
     protected forwardCallTo(
       $object: any,

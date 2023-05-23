@@ -34,6 +34,8 @@ export default function EnumeratesValues<TBase extends Constructor>(
   Class: TBase
 ) {
   return class EnumeratesValues extends Class {
+    static __trait__ = true;
+
     /**
      * The methods that can be proxied.
      *

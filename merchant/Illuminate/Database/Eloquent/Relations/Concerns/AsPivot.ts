@@ -10,6 +10,8 @@ type float = Number;
 type Constructor<T = {}> = new (...args: any[]) => T;
 export default function AsPivot<TBase extends Constructor>(Class: TBase) {
   return class AsPivot extends Class {
+    static __trait__ = true;
+
     /**
      * The parent model of the relationship.
      *

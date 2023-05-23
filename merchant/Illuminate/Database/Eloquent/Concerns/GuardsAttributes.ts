@@ -17,6 +17,8 @@ export default function GuardsAttributes<TBase extends Constructor>(
   Class: TBase
 ) {
   return class GuardsAttributes extends Class {
+    static __trait__ = true;
+
     /**
      * The attributes that are mass assignable.
      *

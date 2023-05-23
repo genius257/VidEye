@@ -10,6 +10,8 @@ export default function HasGlobalScopes<TBase extends Constructor>(
   Class: TBase
 ) {
   return class HasGlobalScopes extends Class {
+    static __trait__ = true;
+
     /**
      * Register a new global scope on the model.
      *

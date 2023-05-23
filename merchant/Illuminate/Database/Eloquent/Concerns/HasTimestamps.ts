@@ -5,6 +5,8 @@ type Constructor<T = {}> = new (...args: any[]) => T;
 
 export default function HasTimestamps<TBase extends Constructor>(Class: TBase) {
   return class HasTimestamps extends Class {
+    static __trait__ = true;
+
     /** Indicates if the model should be timestamped. */
     public timestamps: boolean = true;
 

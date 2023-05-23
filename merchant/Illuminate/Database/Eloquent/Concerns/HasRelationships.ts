@@ -21,6 +21,8 @@ export default function HasRelationships<TBase extends Constructor>(
   Class: TBase
 ) {
   return class HasRelationships extends Class {
+    static __trait__ = true;
+
     /**
      * The loaded relationships for the model.
      *

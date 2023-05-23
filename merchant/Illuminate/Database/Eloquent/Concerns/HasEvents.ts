@@ -20,6 +20,8 @@ import { Model } from "../Model";
 type Constructor<T = {}> = new (...args: any[]) => T;
 export default function HasEvents<TBase extends Constructor>(Class: TBase) {
   return class HasEvents extends Class {
+    static __trait__ = true;
+
     /**
      * The event map for the model.
      *

@@ -47,6 +47,8 @@ type Constructor<T = {}> = new (...args: any[]) => T;
 
 export default function HasAttributes<TBase extends Constructor>(Class: TBase) {
   return class HasAttributes extends Class {
+    static __trait__ = true;
+
     /** The model's attributes. */
     protected attributes = {};
     /** The model attribute's original state. */

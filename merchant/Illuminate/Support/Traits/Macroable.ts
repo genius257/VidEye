@@ -5,6 +5,8 @@ import BadMethodCallException from "../../../PHP/Exceptions/BadMethodCallExcepti
 type Constructor<T = {}> = new (...args: any[]) => T;
 export default function Macroable<TBase extends Constructor>(Class: TBase) {
   return class Macroable extends Class {
+    static __trait__ = true;
+
     /**
      * The registered string macros.
      *

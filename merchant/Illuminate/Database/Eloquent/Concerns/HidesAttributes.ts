@@ -8,6 +8,8 @@ export default function HidesAttributes<TBase extends Constructor>(
   Class: TBase
 ) {
   return class HidesAttributes extends Class {
+    static __trait__ = true;
+
     /**The attributes that should be hidden for serialization.*/
     protected hidden: any[] = [];
 
