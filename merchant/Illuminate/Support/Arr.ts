@@ -30,7 +30,9 @@ import InvalidArgumentException from "../../PHP/Exceptions/InvalidArgumentExcept
 import Collection from "./Collection";
 import { data_get, value } from "./helpers";
 import Macroable from "./Traits/Macroable";
-import ArrayAccess from "../../PHP/Interfaces/ArrayAccess";
+import ArrayAccess, {
+  instanceofArrayAccess
+} from "../../PHP/Interfaces/ArrayAccess";
 
 interface Json {
   [key: string]: string | number | boolean | Json | Json[];
@@ -47,7 +49,7 @@ export default class Arr extends Macroable(class {}) {
    * @return bool
    */
   public static accessible($value) {
-    return is_array($value) || $value instanceof ArrayAccess;
+    return is_array($value) || instanceofArrayAccess($value);
   }
 
   /**
@@ -164,7 +166,7 @@ export default class Arr extends Macroable(class {}) {
    * @return bool
    */
   public static exists($array, $key) {
-    if ($array instanceof ArrayAccess) {
+    if (instanceofArrayAccess($array)) {
       return $array.offsetExists($key);
     }
 
