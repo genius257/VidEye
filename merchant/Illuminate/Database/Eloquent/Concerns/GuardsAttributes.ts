@@ -1,4 +1,5 @@
 import {
+  array_diff,
   array_flip,
   array_intersect_key,
   array_merge,
@@ -201,8 +202,14 @@ export default function GuardsAttributes<TBase extends Constructor>(
       }
 
       return (
-        this.getGuarded() == ["*"] ||
-        !empty(preg_grep("/^" + preg_quote($key) + "$/i", this.getGuarded())) ||
+        empty(array_diff(this.getGuarded(), ["*"])) ||
+        !empty(
+          this.getGuarded()
+            .map((guarded) =>
+              new RegExp("^" + preg_quote($key) + "$", "i").exec(guarded)
+            )
+            .filter((v) => v)
+        ) ||
         !this.isGuardableColumn($key)
       );
     }
