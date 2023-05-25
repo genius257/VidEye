@@ -4,7 +4,7 @@ import {
 } from "../../merchant/Illuminate/Database/Eloquent/Model";
 
 export class Series extends Model {
-  fillable = ["title"];
+    protected $fillable = ["title"];
 
     /**
      * Check if Series has been watched 100%
