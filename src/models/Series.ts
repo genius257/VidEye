@@ -63,6 +63,7 @@ const Z = ProxyIt(Series);
 console.log("Model.$resolver", Model.getConnectionResolver());
 console.log("Z.$resolver", Z.getConnectionResolver());
 
+//@ts-expect-error
 const instance = Z.newModelInstance();
 const collection = instance.newCollection();
 [{}, {}, {}].forEach((document) => {
