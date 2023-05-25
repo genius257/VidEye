@@ -1,6 +1,8 @@
 type Constructor<T = {}> = new (...args: any[]) => T;
 function trait<TBase extends Constructor>(Class: TBase) {
-  return class Trait extends Class {};
+  return class Trait extends Class {
+    static __trait__ = true;
+  };
 }
 
 function traits<TBase extends Constructor>(...traits: TBase[]) {
