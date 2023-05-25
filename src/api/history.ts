@@ -1,5 +1,4 @@
 import lockr from "lockr";
-import { Model } from "../../merchant/Illuminate/Database/Eloquent/Model";
 import Arr from "../../merchant/Illuminate/Support/Arr";
 import Firebase from "../Firebase/Firebase";
 
