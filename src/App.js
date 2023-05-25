@@ -11,6 +11,7 @@ import ContextMenu from "./contextMenu";
 import Me from "./views/me";
 import Avatar from "./components/Avatar";
 import Auth from "./Firebase/Auth";
+import supabase from "./Supabase/index";
 
 // https://dribbble.com/shots/7061489-Netflix-Homepage-Redesign-Concept
 // https://dribbble.com/shots/4361663-Netflix-Redesign
@@ -73,34 +74,36 @@ import Auth from "./Firebase/Auth";
 //Object.prototype.map = f => console.log(this)||Object.keys(this).map(key => f.call(null, key, this[key]));
 
 export default class App extends React.Component {
-  render() {
-    return (
-      <div className="App">
-        <header>
-          <HashRouter>
-            <Link to="/">
-              <i className="material-icons logo">play_circle_filled</i>
-            </Link>
-            <Link to="/me/">
-              <Auth>
-                <Avatar />
-              </Auth>
-            </Link>
-          </HashRouter>
-        </header>
-        <Auth>
-          <HashRouter>
-            <Switch>
-              <Route exact path="/" component={DashboardView} />
-              <Route path="/series/:id/" component={SeriesView} />
-              <Route path="/watch/:id/" component={WatchView} />
-              <Route path="/me/" component={Me} />
-            </Switch>
-          </HashRouter>
-        </Auth>
-        <footer>footer</footer>
-        <ContextMenu />
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div className="App">
+                <header>
+                    <HashRouter>
+                        <Link to="/">
+                            <i className="material-icons logo">
+                                play_circle_filled
+                            </i>
+                        </Link>
+                        <Link to="/me/">
+                            <Auth>
+                                <Avatar />
+                            </Auth>
+                        </Link>
+                    </HashRouter>
+                </header>
+                <Auth>
+                    <HashRouter>
+                        <Switch>
+                            <Route exact path="/" component={DashboardView} />
+                            <Route path="/series/:id/" component={SeriesView} />
+                            <Route path="/watch/:id/" component={WatchView} />
+                            <Route path="/me/" component={Me} />
+                        </Switch>
+                    </HashRouter>
+                </Auth>
+                <footer>footer</footer>
+                <ContextMenu />
+            </div>
+        );
+    }
 }
