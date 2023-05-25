@@ -1,7 +1,7 @@
 import React from "react";
 import "./PosterGrid.css";
 
-export default class PosterGrid extends React.Component {
+export default class PosterGrid extends React.Component<React.PropsWithChildren> {
     /**
      * render
      */
