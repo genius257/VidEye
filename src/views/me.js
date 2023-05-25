@@ -2,26 +2,36 @@ import React from "react";
 import { HashRouter, Switch, Route, Link } from "react-router-dom";
 import moment from "moment";
 
-import firebase from "../Firebase";
 import History from "../history";
-import config from "../Firebase/config";
 import Card from "../card";
-import GoogleSigninButton from "../components/google_signin_button";
-import Firebase from "../Firebase/Firebase";
 import Poster from "../components/Poster";
 import PosterGrid from "../components/PosterGrid";
+import supabase from "../Supabase";
+import Supabase from "../Supabase/Supabase";
 
 export default class Me extends React.Component {
     render() {
         //console.log(this.props);
 
-        let loggedIn = Firebase.isSignedIn(); //FIXME: implement login check
+        let loggedIn = Supabase.isSignedIn();
         if (!loggedIn) {
             return (
                 <>
-                    <GoogleSigninButton
-                        onClick={(event) => Firebase.signInWithPopup()}
-                    />
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            console.log(event.target.email.value);
+                            supabase.auth
+                                .signInWithOtp({
+                                    email: event.target.email.value,
+                                    options: { shouldCreateUser: true }
+                                })
+                                .then((value) => value.data);
+                        }}
+                    >
+                        <input type="email" name="email" placeholder="E-mail" />
+                        <input type="submit" value="Login" />
+                    </form>
                 </>
             );
         }
@@ -38,7 +48,7 @@ export default class Me extends React.Component {
                         lineHeight: "40px",
                         cursor: "pointer"
                     }}
-                    onClick={(event) => Firebase.signOut()}
+                    onClick={(event) => Supabase.signOut()}
                 >
                     sign out
                 </div>
