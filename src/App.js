@@ -10,7 +10,7 @@ import WatchView from "./views/watch";
 import ContextMenu from "./contextMenu";
 import Me from "./views/me";
 import Avatar from "./components/Avatar";
-import Auth from "./Firebase/Auth";
+import Auth from "./Supabase/Auth";
 import supabase from "./Supabase/index";
 
 // https://dribbble.com/shots/7061489-Netflix-Homepage-Redesign-Concept
