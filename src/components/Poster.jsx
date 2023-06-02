@@ -73,6 +73,7 @@ export default class Poster extends React.Component {
                     "--card-progress": this.state.progress
                 }}
                 onContextMenu={this.onContextMenu.bind(this)}
+                title={this.props.title}
             >
                 {this.state.counter !== null || !this.state.watched ? (
                     <div className="posterCounter"></div>
