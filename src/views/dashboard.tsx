@@ -1,18 +1,26 @@
 import React from "react";
-import { HashRouter, Switch, Route, Link } from "react-router-dom";
+import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
 import moment from "moment";
 
-import firebase from "../Firebase";
 import History from "../history";
 import config from "../Firebase/config";
 import Card from "../card";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
 
-export default class Dashboard extends React.Component {
+export default class Dashboard extends React.Component<
+    {},
+    { series: {}; watched: Array<unknown> }
+> {
     state = {
         series: {},
-        watched: []
+        watched: [] as Array<{
+            series: string;
+            season: string;
+            episode: string;
+            time: number;
+            totalTime: number;
+        }>
     };
 
     componentDidMount() {
@@ -21,7 +29,7 @@ export default class Dashboard extends React.Component {
             .select("*")
             .then((result) => {
                 const series = {};
-                result.data.forEach((_series) => {
+                result.data?.forEach((_series) => {
                     series[_series.id] = _series;
                 });
                 this.setState({ series } /*, () => this.loadWatched()*/);
@@ -55,8 +63,14 @@ export default class Dashboard extends React.Component {
 
     loadWatched() {
         let watched = History.getUnwatched();
-        let jobs = [];
-        let result = [];
+        let jobs: Array<Promise<number | Response>> = [];
+        let result: Array<{
+            series: string;
+            season: string;
+            episode: string;
+            time: number;
+            totalTime: number;
+        }> = [];
         Object.keys(watched).forEach((series) =>
             Object.keys(watched[series]).forEach((season) =>
                 Object.keys(watched[series][season]).forEach((episode) => {
@@ -98,7 +112,7 @@ export default class Dashboard extends React.Component {
         );
     }
 
-    componentDidCatch(error, errorInfo) {
+    componentDidCatch(error: any, errorInfo: any) {
         // You can also log the error to an error reporting service
         console.log(error, errorInfo);
     }
