@@ -1,8 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
 import ContextMenu, { ContextMenuItem } from "./contextMenu";
-import History from "./history";
 
 /*const [
   bindMenu,
@@ -22,7 +20,13 @@ import History from "./history";
   collect: () => "useContextMenu is cool!" // collect data to be passed to the context menu, see the example to see this in action
 });*/
 
-export default class Card extends React.Component {
+export default class Card extends React.Component<
+    React.PropsWithChildren<{
+        marked: boolean;
+        image?: string;
+        progress?: string;
+    }>
+> {
     /*const [
     bindMenu,
     bindMenuItem,
@@ -30,25 +34,21 @@ export default class Card extends React.Component {
     { data, coords, setVisible }
   ] = useContextMenu();*/
 
-    static propTypes = {
-        marked: PropTypes.bool,
-        image: PropTypes.string,
-        progress: PropTypes.string
-    };
-
     static defaultProps = {
         marked: false
     };
 
-    onContextMenu(e) {
+    root: HTMLDivElement | null = null;
+
+    onContextMenu(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         e.preventDefault();
 
         const clickX = e.clientX;
         const clickY = e.clientY;
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
-        const rootW = this.root.offsetWidth;
-        const rootH = this.root.offsetHeight;
+        const rootW = this.root?.offsetWidth ?? 0;
+        const rootH = this.root?.offsetHeight ?? 0;
 
         const right = screenW - clickX > rootW;
         const left = !right;
@@ -58,7 +58,9 @@ export default class Card extends React.Component {
         ContextMenu.add(
             <React.Fragment>
                 <ContextMenuItem
-                    onClick={(e) => console.log("mark as watched")}
+                    onClick={(
+                        e: React.MouseEvent<HTMLDivElement, MouseEvent>
+                    ) => console.log("mark as watched")}
                 >
                     Mark as watched
                 </ContextMenuItem>
@@ -102,6 +104,7 @@ export default class Card extends React.Component {
                 className={className}
                 style={{
                     backgroundImage: this.props.image,
+                    //@ts-ignore
                     "--card-progress": this.props.progress
                 }}
                 onContextMenu={this.onContextMenu.bind(this)}
