@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
+    "@types/jest": "^29.5.2",
     "@types/lockr": "^0.8.8",
     "@types/react": "^18.2.6",
     "@types/react-router-dom": "^5.3.3",
