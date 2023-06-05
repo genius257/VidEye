@@ -1,14 +1,17 @@
 import lockr from "lockr";
+import { episode_id } from "./dataTypes/episodes";
+import { season_id } from "./dataTypes/seasons";
+import { series_id } from "./dataTypes/series";
 
 lockr.prefix = "VidEye";
 
-function get(obj, key, def) {
+function get(obj: {}, key: string, def?: any): unknown {
     return key
         .split(".")
         .reduce((o, x) => (o instanceof Object && x in o ? o[x] : def), obj);
 }
 
-function set(obj, key, val) {
+function set(obj: {}, key: string, val: any) {
     key.split(".").reduce((o, x, idx, src) => {
         let end = !(src.length > ++idx);
         if (o instanceof Object && (!(x in o) || end)) {
@@ -26,38 +29,61 @@ function set(obj, key, val) {
 }
 
 export default class History {
-    static enum;
+    static enum: unknown;
 
-    static getWatchTime(series, season, episode, _default = 0) {
+    static getWatchTime(
+        series: series_id,
+        season: season_id,
+        episode: episode_id,
+        _default: number = 0
+    ) {
         let match = this.getUnwatched(series, season, episode);
         return match?.[series]?.[season]?.[episode]?.["time"] ?? _default;
     }
 
-    static setWatchTime(series, season, episode, time, duration = null) {
-        let data = lockr.get(series, {});
+    static setWatchTime(
+        series: series_id,
+        season: season_id,
+        episode: episode_id,
+        time: number,
+        duration: number | null = null
+    ) {
+        let data = lockr.get(series.toString(), {});
         set(data, `${season}.${episode}`, { time, duration });
-        lockr.set(series, data);
+        lockr.set(series.toString(), data);
     }
 
-    static setWatched(series, season, episode) {
+    static setWatched(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ) {
         //
     }
 
-    static setUnwatched(series, season, episode) {
+    static setUnwatched(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ) {
         //
     }
 
-    static isUnwatched(series, season, episode, dictionary) {
-        return false;
+    static isUnwatched(
+        series: series_id | string,
+        season: season_id | string | undefined,
+        episode: episode_id | string | undefined,
+        dictionary: any //{ seasons: { episodes: {} } } | { episodes: {} }
+    ): boolean {
         //console.log(arguments);
-        let data = lockr.get(series, undefined);
-        let s = season && get(data, season);
-        let e = episode && get(s, episode);
+        let data = lockr.get<{}>(series.toString(), undefined);
+        let s: any = season && get(data, season.toString());
+        let e = episode && get(s, episode.toString());
 
         // check if target exists in watched records
         let exists = series !== undefined;
-        exists = exists && ((season && s) || !season);
-        exists = exists && ((episode && e) || !episode);
+        exists = Boolean(exists && ((season && s) || !season));
+        exists = Boolean(exists && ((episode && e) || !episode));
 
         try {
             return (
@@ -69,37 +95,62 @@ export default class History {
                     !e) ||
                 (exists &&
                     !season &&
-                    Object.keys(dictionary.seasons).every((s) =>
+                    Object.keys(dictionary?.seasons).every((s) =>
                         this.isUnwatched(
                             series,
                             s,
                             undefined,
-                            dictionary.seasons
+                            dictionary?.seasons
                         )
                     ))
             );
         } catch (e) {
             // console.log(e);
+            return false;
         }
     }
 
-    static getNextUnwatched(series, season, episode) {
+    static getNextUnwatched(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ) {
         //
     }
 
-    static getNextAfter(series, season, episode) {
+    static getNextAfter(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ) {
         //
     }
 
-    static hasUnwatchedInSeason(series, season, episode) {
+    static hasUnwatchedInSeason(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ) {
         //
     }
 
-    static getUnwatched(series, season, episode) {
+    static getUnwatched(): any;
+    static getUnwatched(series: series_id): any;
+    static getUnwatched(series: series_id, season: season_id): any;
+    static getUnwatched(
+        series: series_id,
+        season: season_id,
+        episode: episode_id
+    ): any;
+    static getUnwatched(
+        series?: series_id,
+        season?: season_id,
+        episode?: episode_id
+    ) {
         let result = {};
         let keys = series === undefined ? lockr.keys() : [series];
         keys.forEach((key) => {
-            result[key] = lockr.get(key); //filter if season and episode is set
+            result[key] = lockr.get(key.toString()); //filter if season and episode is set
         });
         return result;
     }
