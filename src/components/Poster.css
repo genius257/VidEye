@@ -2,6 +2,7 @@
   /* calculate height to preserve a 4:3 aspect ratio */
   --poster-final-width: var(--poster-width, 127px);
   --poster-final-height: calc(var(--poster-final-width) * (4 / 3));
+  --poster-final-height: calc(var(--poster-final-width) * 1.5);
 
   position: relative;
   width: var(--poster-final-width);
