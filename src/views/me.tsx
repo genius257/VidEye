@@ -1,38 +1,80 @@
 import React from "react";
-import { HashRouter, Switch, Route, Link } from "react-router-dom";
-import moment from "moment";
+import { HashRouter, Switch, Route /*, Link*/ } from "react-router-dom";
+import OTP from "../components/OTP";
+//import moment from "moment";
 
-import History from "../history";
-import Card from "../card";
+//import History from "../history";
+//import Card from "../card";
 import Poster from "../components/Poster";
 import PosterGrid from "../components/PosterGrid";
 import supabase from "../Supabase";
 import Supabase from "../Supabase/Supabase";
 
-export default class Me extends React.Component {
+export default class Me extends React.Component<{}, { email: string | null }> {
+    state: Readonly<{ email: string | null }> = {
+        email: null
+    };
+
     render() {
-        //console.log(this.props);
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    paddingTop: "20px"
+                }}
+            >
+                <OTP />
+            </div>
+        );
 
         let loggedIn = Supabase.isSignedIn();
         if (!loggedIn) {
-            return (
-                <>
+            if (this.state.email === null) {
+                return (
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
-                            console.log(event.target.email.value);
-                            supabase.auth
-                                .signInWithOtp({
-                                    email: event.target.email.value,
-                                    options: { shouldCreateUser: true }
-                                })
-                                .then((value) => value.data);
+                            supabase.auth.signInWithOtp({
+                                //@ts-expect-error
+                                email: event.target.email.value,
+                                options: { shouldCreateUser: true }
+                            });
+                            //.then((value) => value.data);
+                            this.setState({
+                                //@ts-expect-error
+                                email: event.target.email.value
+                            });
+                            //@ts-expect-error
+                            event.target.email.value = "";
                         }}
                     >
                         <input type="email" name="email" placeholder="E-mail" />
                         <input type="submit" value="Login" />
                     </form>
-                </>
+                );
+            }
+
+            return (
+                <form
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        supabase.auth.verifyOtp({
+                            email: this.state.email!,
+                            type: "email",
+                            //@ts-expect-error
+                            token: event.target.otp.value
+                        });
+                        //.then((value) => value.data);
+                    }}
+                >
+                    <input
+                        type="string"
+                        name="otp"
+                        placeholder="One time password"
+                    />
+                    <input type="submit" value="Login" />
+                </form>
             );
         }
 
