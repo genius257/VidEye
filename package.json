@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A streaming service experience powered by YouTube and Cloud Firestore",
   "keywords": [],
-  "main": "src/index.js",
+  "main": "src/index.tsx",
   "dependencies": {
     "@supabase/supabase-js": "2.12.1",
     "blueimp-md5": "^2.19.0",
