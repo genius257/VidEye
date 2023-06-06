@@ -3,7 +3,6 @@ import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
 import moment from "moment";
 
 import History from "../history";
-import config from "../Firebase/config";
 import Card from "../card";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
