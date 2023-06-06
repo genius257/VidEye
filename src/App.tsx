@@ -2,7 +2,6 @@ import React from "react";
 
 import { HashRouter, Switch, Route, Link } from "react-router-dom";
 
-import History from "./history";
 import DashboardView from "./views/dashboard";
 import SeriesView from "./views/series";
 import WatchView from "./views/watch";
@@ -11,7 +10,6 @@ import ContextMenu from "./contextMenu";
 import Me from "./views/me";
 import Avatar from "./components/Avatar";
 import Auth from "./Supabase/Auth";
-import supabase from "./Supabase/index";
 
 // https://dribbble.com/shots/7061489-Netflix-Homepage-Redesign-Concept
 // https://dribbble.com/shots/4361663-Netflix-Redesign
