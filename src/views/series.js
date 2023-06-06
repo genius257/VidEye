@@ -1,12 +1,10 @@
 import React from "react";
 import { HashRouter, Switch, Route, Link } from "react-router-dom";
 
-import firebase from "../Firebase";
 import Video from "./video";
 import History from "../history";
 import Card from "../card";
 import moment from "moment";
-import config from "../Firebase/config";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
 
