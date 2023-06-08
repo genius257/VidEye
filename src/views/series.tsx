@@ -33,7 +33,6 @@ export default class Series extends React.Component<
             .eq("id", this.props.match.params.id)
             .single()
             .then((response) => {
-                console.log(response.data);
                 this.setState({ series: response.data as series });
             });
     }
@@ -103,8 +102,6 @@ export default class Series extends React.Component<
     }
 
     render() {
-        console.log(this.state.series);
-
         return (
             <div>
                 <HashRouter>
@@ -146,10 +143,6 @@ export default class Series extends React.Component<
                         strict
                         path="/series/:id/:season/"
                         render={(routeProps) => {
-                            console.log(
-                                routeProps.match.params.season,
-                                typeof routeProps.match.params.season
-                            );
                             return (
                                 <div className="horizontal-list">
                                     {(
@@ -159,7 +152,6 @@ export default class Series extends React.Component<
                                                 routeProps.match.params.season
                                         )?.episodes || []
                                     ).map((episode) => {
-                                        console.log(episode);
                                         /*let watch = {
                                             time: History.getWatchTime(
                                                 this.props.match.params.id,
@@ -184,7 +176,7 @@ export default class Series extends React.Component<
                                                         episode,
                                                         this.state.seasons
                                                     )}*/
-                                                    image={`url('https://img.youtube.com/vi/${episode?.videos?.[0]?.ytid}/mqdefault.jpg')`}
+                                                    image={`url('https://img.youtube.com/vi/${episode?.videos?.ytid}/mqdefault.jpg')`}
                                                     /*progress={
                                                         History.isUnwatched(
                                                             this.props.match
@@ -223,7 +215,7 @@ export default class Series extends React.Component<
                                     (episode) =>
                                         episode.id.toString() ===
                                         routeProps.match.params.episode
-                                )?.videos?.[0] ? (
+                                )?.videos ? (
                                 <Video
                                     id="ytplayer"
                                     title="ytplayer"
@@ -246,7 +238,7 @@ export default class Series extends React.Component<
                                                     episode.id.toString() ===
                                                     routeProps.match.params
                                                         .episode
-                                            )?.videos?.[0].ytid
+                                            )?.videos?.ytid
                                     }
                                     yt={{
                                         onEnd: (e: unknown) => {
