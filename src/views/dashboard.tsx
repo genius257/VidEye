@@ -1,25 +1,31 @@
 import React from "react";
 import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
-import moment from "moment";
+//import moment from "moment";
 
-import History from "../history";
+import History, { HistoryEntry } from "../history";
 import Card from "../card";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
+import { series } from "../dataTypes/series";
 
 export default class Dashboard extends React.Component<
     {},
-    { series: {}; watched: Array<unknown> }
+    {
+        series: Array<series>;
+        watched: Array<unknown>;
+        history: Array<HistoryEntry>;
+    }
 > {
     state = {
-        series: {},
+        series: [] as Array<series>,
         watched: [] as Array<{
             series: string;
             season: string;
             episode: string;
             time: number;
             totalTime: number;
-        }>
+        }>,
+        history: [] as Array<HistoryEntry>
     };
 
     componentDidMount() {
@@ -27,41 +33,20 @@ export default class Dashboard extends React.Component<
             .from("series")
             .select("*")
             .then((result) => {
-                const series = {};
-                result.data?.forEach((_series) => {
-                    series[_series.id] = _series;
-                });
-                this.setState({ series } /*, () => this.loadWatched()*/);
+                this.setState(
+                    {
+                        series: (result.data as Array<series> | undefined) ?? []
+                    },
+                    () => this.loadWatched()
+                );
             });
-
-        /*
-        try {
-            let db = firebase.firestore();
-            db.collection("series")
-                .get()
-                .then((querySnapshot) => {
-                    var series = {};
-                    querySnapshot.forEach(function (doc) {
-                        // doc.data() is never undefined for query doc snapshots
-                        //console.log(doc.id, " => ", doc.data());
-                        series[doc.id] = doc.data();
-                        //series.push(doc.data());
-                    });
-                    this.setState({ series }, () => this.loadWatched());
-                })
-                .catch((error) => {
-                    console.error("Error getting documents: ", error);
-                });
-        } catch (e) {
-            console.error(
-                "Firebase is not currently available.\nThis could be due to transpiling.\nPlease try and reload if the problem persists"
-            );
-        }
-        */
     }
 
     loadWatched() {
+        History.getHistory().then((history) => this.setState({ history }));
+        /*
         let watched = History.getUnwatched();
+        console.log(watched, this.state.series);
         let jobs: Array<Promise<number | Response>> = [];
         let result: Array<{
             series: string;
@@ -70,6 +55,9 @@ export default class Dashboard extends React.Component<
             time: number;
             totalTime: number;
         }> = [];
+        const seriesIds = [];
+        const seasonIds = [];
+        const episodeIds = [];
         Object.keys(watched).forEach((series) =>
             Object.keys(watched[series]).forEach((season) =>
                 Object.keys(watched[series][season]).forEach((episode) => {
@@ -109,6 +97,7 @@ export default class Dashboard extends React.Component<
         return Promise.all(jobs).then((values) =>
             this.setState({ watched: result })
         );
+        */
     }
 
     componentDidCatch(error: any, errorInfo: any) {
@@ -149,21 +138,26 @@ export default class Dashboard extends React.Component<
                 ) : null}
                 <h2>Recommended</h2>
                 <div className="horizontal-list">
-                    {Object.keys(this.state.series).map((key) => (
-                        <Link to={`/series/${key}/`} key={key}>
+                    {this.state.series.map((series) => (
+                        <Link to={`/series/${series.id}/`} key={series.id}>
                             <Poster
-                                marked={History.isUnwatched(
-                                    key,
-                                    undefined,
-                                    undefined,
-                                    this.state.series[key]
-                                )}
+                                marked={
+                                    !this.state.history.some((entry) =>
+                                        entry.video?.episodes?.some((episode) =>
+                                            episode.seasons?.some(
+                                                (season) =>
+                                                    season.series_id ===
+                                                    series.id
+                                            )
+                                        )
+                                    )
+                                }
                                 image={
                                     "url('https://image.tmdb.org/t/p/w300/" +
-                                    this.state.series[key].poster +
+                                    series.poster +
                                     "')"
                                 }
-                                title={this.state.series[key].title}
+                                title={series.title}
                             />
                         </Link>
                     ))}
