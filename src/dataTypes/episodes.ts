@@ -10,6 +10,6 @@ export type episode = {
     created_at: number;
     episode: number;
     season_id: season_id;
-    videos?: Array<video> | null;
+    videos?: video | null;
     seasons?: Array<season> | null;
 };
