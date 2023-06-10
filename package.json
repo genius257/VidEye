@@ -16,7 +16,7 @@
     "react-dom": "16.8.6",
     "react-router-dom": "5.0.1",
     "react-scripts": "5.0.1",
-    "react-youtube": "7.9.0",
+    "react-youtube": "^10.1.0",
     "ts-mixer": "5.4.0"
   },
   "devDependencies": {
