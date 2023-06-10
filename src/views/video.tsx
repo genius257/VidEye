@@ -49,7 +49,7 @@ type VideoProps = {
     className?: string;
     VIDEO_ID?: string;
 
-    yt: YouTubeProps;
+    yt?: YouTubeProps;
 };
 
 export default withRouter(
