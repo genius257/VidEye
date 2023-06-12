@@ -111,16 +111,6 @@ export default class History {
 
     protected static upsert(entries: Array<HistoryEntry>) {
         if (Supabase.isSignedIn()) {
-            console.log(
-                entries.map<Partial<HistoryEntry> & { id?: number }>(
-                    (entry: HistoryEntry & { id?: number }) => ({
-                        time: entry.time,
-                        updated_at: new Date().toISOString(),
-                        video_id: entry.video_id,
-                        ...((entry.id ?? null) === null ? {} : { id: entry.id })
-                    })
-                )
-            );
             return supabase
                 .from("history")
                 .upsert(
