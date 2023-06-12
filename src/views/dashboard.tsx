@@ -108,27 +108,24 @@ export default class Dashboard extends React.Component<
     render() {
         return (
             <React.Fragment>
-                {this.state.watched.length > 0 ? (
+                {this.state.history.length > 0 ? (
                     <React.Fragment>
                         <h2>Continue watching</h2>
                         <div className="horizontal-list">
-                            {this.state.watched.map((watch) => (
+                            {this.state.history.map((watch) => (
                                 <Link
-                                    to={`/series/${watch.series}/${watch.season}/${watch.episode}/`}
-                                    key={`${watch.series}/${watch.season}/${watch.episode}`}
+                                    to={`/series/${watch.videos?.episodes?.[0]?.seasons?.series?.id}/${watch.videos?.episodes?.[0]?.seasons?.id}/${watch.videos?.episodes?.[0]?.id}/`}
+                                    key={`${watch.videos?.episodes?.[0]?.seasons?.series?.id}/${watch.videos?.episodes?.[0]?.seasons?.id}/${watch.videos?.episodes?.[0]?.id}`}
                                 >
                                     <Card
                                         image={
-                                            this.state.series[watch.series] &&
-                                            `url('https://img.youtube.com/vi/${
-                                                this.state.series[watch.series]
-                                                    .seasons[watch.season][
-                                                    watch.episode
-                                                ].YTID
-                                            }/mqdefault.jpg')`
+                                            watch.videos &&
+                                            `url('https://img.youtube.com/vi/${watch.videos.ytid}/mqdefault.jpg')`
                                         }
                                         progress={`${Math.round(
-                                            (watch.time / watch.totalTime) * 100
+                                            ((watch.time ?? 0) /
+                                                /*watch.totalTime*/ 0) *
+                                                100
                                         )}%`}
                                     />
                                 </Link>
@@ -143,12 +140,10 @@ export default class Dashboard extends React.Component<
                             <Poster
                                 marked={
                                     !this.state.history.some((entry) =>
-                                        entry.video?.episodes?.some((episode) =>
-                                            episode.seasons?.some(
-                                                (season) =>
-                                                    season.series_id ===
-                                                    series.id
-                                            )
+                                        entry.videos?.episodes?.some(
+                                            (episode) =>
+                                                episode?.seasons?.series_id ===
+                                                series.id
                                         )
                                     )
                                 }
