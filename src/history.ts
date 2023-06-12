@@ -131,7 +131,7 @@ export default class History {
                     }
                 )
                 .select()
-                .then((result) => console.log(result));
+                .then(/*(result) => console.log(result)*/);
         } else {
             const history = this.getLocalHistory();
             entries = entries.map((entry) => {
