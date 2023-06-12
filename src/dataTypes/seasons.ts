@@ -1,6 +1,6 @@
 import { Brand } from "./brand";
 import { episode } from "./episodes";
-import { series_id } from "./series";
+import { series, series_id } from "./series";
 
 export type season_id = Brand<number, "season_id">;
 export type season = {
@@ -10,5 +10,5 @@ export type season = {
     created_at: number;
     title: string;
     episodes?: Array<episode> | null;
-    series?: Array<series_id> | null;
+    series?: series | null;
 };

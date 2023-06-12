@@ -11,5 +11,5 @@ export type episode = {
     episode: number;
     season_id: season_id;
     videos?: video | null;
-    seasons?: Array<season> | null;
+    seasons?: season | null;
 };
