@@ -10,10 +10,10 @@ lockr.prefix = "VidEye";
 
 export type HistoryEntry = {
     video_id: video_id;
-    created_at: number;
-    updated_at: number;
+    created_at: string;
+    updated_at: string;
     time: number | null;
-    video?: video;
+    videos?: video;
 };
 
 /*
@@ -72,23 +72,29 @@ export default class History {
             });
     }
 
-    public static markEpisodeAsWatched(episode: episode_id) {
+    public static markEpisodeAsWatched(
+        episode: episode_id,
+        time: HistoryEntry["time"] = null
+    ) {
         return supabase
             .from("videos")
-            .select("id, episodes(id)")
-            .filter("episodes.id", "eq", episode)
+            .select("id, episodes!inner(id)")
+            .eq("episodes.id", episode)
             .then((result) => {
                 this.upsert(
                     result.data?.map((video) =>
-                        this.makeHistoryEntry(video.id as video_id)
+                        this.makeHistoryEntry(video.id as video_id, time)
                     ) ?? []
                 );
                 return result.data;
             });
     }
 
-    public static markVideoAsWatched(video: video_id) {
-        return this.upsert([this.makeHistoryEntry(video)]);
+    public static markVideoAsWatched(
+        video: video_id,
+        time: HistoryEntry["time"] = null
+    ) {
+        return this.upsert([this.makeHistoryEntry(video, time)]);
     }
 
     public static makeHistoryEntry(
@@ -97,27 +103,45 @@ export default class History {
     ): HistoryEntry {
         return {
             video_id: video,
-            created_at: Date.now(),
-            updated_at: Date.now(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
             time: time
         };
     }
 
     protected static upsert(entries: Array<HistoryEntry>) {
         if (Supabase.isSignedIn()) {
+            console.log(
+                entries.map<Partial<HistoryEntry> & { id?: number }>(
+                    (entry: HistoryEntry & { id?: number }) => ({
+                        time: entry.time,
+                        updated_at: new Date().toISOString(),
+                        video_id: entry.video_id,
+                        ...((entry.id ?? null) === null ? {} : { id: entry.id })
+                    })
+                )
+            );
             return supabase
                 .from("history")
                 .upsert(
-                    entries.map<Partial<HistoryEntry> & { id: number | null }>(
+                    entries.map<Partial<HistoryEntry> & { id?: number }>(
                         (entry: HistoryEntry & { id?: number }) => ({
                             time: entry.time,
-                            updated_at: Date.now(),
+                            updated_at: new Date().toISOString(),
                             video_id: entry.video_id,
-                            id: entry.id ?? null
+                            ...((entry.id ?? null) === null
+                                ? {}
+                                : { id: entry.id })
                         })
-                    )
+                    ),
+                    {
+                        defaultToNull: false,
+                        onConflict: "user_id, video_id",
+                        ignoreDuplicates: false
+                    }
                 )
-                .select();
+                .select()
+                .then((result) => console.log(result));
         } else {
             const history = this.getLocalHistory();
             entries = entries.map((entry) => {
@@ -152,38 +176,23 @@ export default class History {
                     this.getLocalHistory().map((entry) => entry.video_id)
                 )
                 .then((response) =>
-                    response.data?.reduce<
-                        Array<
-                            HistoryEntry & {
-                                videos: {
-                                    id: video_id;
-                                    seasons: {
-                                        id: season_id;
-                                        series: { id: series_id };
-                                    };
-                                };
-                            }
-                        >
-                    >((previousValue, currentValue) => {
-                        previousValue.push(
-                            ...history
-                                .filter(
-                                    (entry) =>
-                                        entry.video_id === currentValue.id
-                                )
-                                .map((entry) => ({
-                                    ...entry,
-                                    videos: currentValue as unknown as {
-                                        id: video_id;
-                                        seasons: {
-                                            id: season_id;
-                                            series: { id: series_id };
-                                        };
-                                    }
-                                }))
-                        );
-                        return previousValue;
-                    }, [])
+                    response.data?.reduce<Array<HistoryEntry>>(
+                        (previousValue, currentValue) => {
+                            previousValue.push(
+                                ...history
+                                    .filter(
+                                        (entry) =>
+                                            entry.video_id === currentValue.id
+                                    )
+                                    .map((entry) => ({
+                                        ...entry,
+                                        videos: currentValue as video
+                                    }))
+                            );
+                            return previousValue;
+                        },
+                        []
+                    )
                 );
         }
     }
@@ -204,7 +213,9 @@ export default class History {
         if (Supabase.isSignedIn()) {
             return supabase
                 .from("history")
-                .select("*, videos(id, episodes(id, seasons(id, series(id))))")
+                .select(
+                    "*, videos(id, ytid, episodes(id, seasons(id, series(id))))"
+                )
                 .then(
                     (response) => (response.data as HistoryEntry[] | null) ?? []
                 );
@@ -219,38 +230,24 @@ export default class History {
                 )
                 .then(
                     (response) =>
-                        response.data?.reduce<
-                            Array<
-                                HistoryEntry & {
-                                    videos: {
-                                        id: video_id;
-                                        seasons: {
-                                            id: season_id;
-                                            series: { id: series_id };
-                                        };
-                                    };
-                                }
-                            >
-                        >((previousValue, currentValue) => {
-                            previousValue.push(
-                                ...history
-                                    .filter(
-                                        (entry) =>
-                                            entry.video_id === currentValue.id
-                                    )
-                                    .map((entry) => ({
-                                        ...entry,
-                                        videos: currentValue as unknown as {
-                                            id: video_id;
-                                            seasons: {
-                                                id: season_id;
-                                                series: { id: series_id };
-                                            };
-                                        }
-                                    }))
-                            );
-                            return previousValue;
-                        }, []) ?? []
+                        response.data?.reduce<Array<HistoryEntry>>(
+                            (previousValue, currentValue) => {
+                                previousValue.push(
+                                    ...history
+                                        .filter(
+                                            (entry) =>
+                                                entry.video_id ===
+                                                currentValue.id
+                                        )
+                                        .map((entry) => ({
+                                            ...entry,
+                                            videos: currentValue as video
+                                        }))
+                                );
+                                return previousValue;
+                            },
+                            []
+                        ) ?? []
                 );
         }
     }
