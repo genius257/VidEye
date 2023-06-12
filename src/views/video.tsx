@@ -100,14 +100,13 @@ export default withRouter(
             //let season = this.props.match.params.season;
             let episode = this.props.match.params.episode;
 
-            let duration = this.player.getDuration();
-            console.log(duration);
+            //let duration = this.player.getDuration();
 
             //History.setWatchTime(series, season, episode, time, duration);
             History.markEpisodeAsWatched(
-                parseInt(episode) as episode_id /*,
-                time,
-                duration*/
+                parseInt(episode) as episode_id,
+                time
+                //duration*/
             );
         }
 
