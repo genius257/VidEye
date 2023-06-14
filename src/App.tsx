@@ -4,6 +4,7 @@ import { HashRouter, Switch, Route, Link } from "react-router-dom";
 
 import DashboardView from "./views/dashboard";
 import SeriesView from "./views/series";
+import MoviesView from "./views/movies";
 import WatchView from "./views/watch";
 
 import ContextMenu from "./contextMenu";
@@ -94,6 +95,7 @@ export default class App extends React.Component {
                         <Switch>
                             <Route exact path="/" component={DashboardView} />
                             <Route path="/series/:id/" component={SeriesView} />
+                            <Route path="/movies/:id/" component={MoviesView} />
                             <Route path="/watch/:id/" component={WatchView} />
                             <Route path="/me/" component={Me} />
                         </Switch>
