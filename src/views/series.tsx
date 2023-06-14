@@ -13,13 +13,17 @@ import Card from "../card";
 //import moment from "moment";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
-import { series } from "../dataTypes/series";
+
+type SeriesState = {
+    seasons: {};
+    series: Awaited<ReturnType<Series["getSeries"]>>["data"];
+};
 
 export default class Series extends React.Component<
     RouteComponentProps<{ id: string; season: string; episode: string }>,
-    { seasons: {}; series: series | null }
+    SeriesState
 > {
-    state: { seasons: {}; series: series | null } = {
+    state: SeriesState = {
         seasons: {},
         series: null
     };
@@ -27,14 +31,9 @@ export default class Series extends React.Component<
     end: boolean = false;
 
     componentDidMount() {
-        supabase
-            .from("series")
-            .select("*, seasons(*, episodes (*, videos (*)))")
-            .eq("id", this.props.match.params.id)
-            .single()
-            .then((response) => {
-                this.setState({ series: response.data as series });
-            });
+        this.getSeries().then((response) => {
+            this.setState({ series: response.data });
+        });
     }
 
     //FIXME: should not be any
@@ -44,7 +43,7 @@ export default class Series extends React.Component<
             nextProps.match.params.season !== this.props.match.params.season ||
             nextProps.match.params.episode !==
                 this.props.match.params.episode ||
-            this.state.series?.id !== nextState.series.id
+            this.state.series?.id !== nextState.series?.id
         );
         //FIXME: adding season to url, does not trigger this, view should be cut up into smaller components.
         if (
@@ -97,11 +96,22 @@ export default class Series extends React.Component<
         return true;
     }
 
+    getSeries() {
+        return supabase
+            .from("series")
+            .select("*, seasons(*, episodes (*, videos (*)))")
+            .eq("id", this.props.match.params.id)
+            .single()
+            .then();
+    }
+
     loadWatched() {
         //TODO
     }
 
     render() {
+        const seasons = [this.state.series?.seasons ?? []].flat();
+
         return (
             <div>
                 <HashRouter>
@@ -113,27 +123,25 @@ export default class Series extends React.Component<
                             <React.Fragment>
                                 <h1>{this.state.series?.title}</h1>
                                 <div className="horizontal-list">
-                                    {this.state.series?.seasons?.map(
-                                        (season) => (
-                                            <Link
-                                                to={`./${season.id}/`}
-                                                key={season.id}
-                                            >
-                                                <Poster
-                                                    /*marked={History.isUnwatched(
+                                    {seasons.map((season) => (
+                                        <Link
+                                            to={`./${season.id}/`}
+                                            key={season.id}
+                                        >
+                                            <Poster
+                                                /*marked={History.isUnwatched(
                                                         this.state.series?.id,
                                                         season.id,
                                                         undefined,
                                                         this.state.series
                                                             ?.seasons
                                                     )}*/
-                                                    image={`url('https://image.tmdb.org/t/p/w300/${season.poster}')`}
-                                                >
-                                                    {season.id}
-                                                </Poster>
-                                            </Link>
-                                        )
-                                    )}
+                                                image={`url('https://image.tmdb.org/t/p/w300/${season.poster}')`}
+                                            >
+                                                {season.id}
+                                            </Poster>
+                                        </Link>
+                                    ))}
                                 </div>
                             </React.Fragment>
                         )}
@@ -145,14 +153,16 @@ export default class Series extends React.Component<
                         render={(routeProps) => {
                             return (
                                 <div className="horizontal-list">
-                                    {(
-                                        this.state.series?.seasons?.find(
+                                    {[
+                                        seasons.find(
                                             (season) =>
                                                 season.id.toString() ===
                                                 routeProps.match.params.season
-                                        )?.episodes || []
-                                    ).map((episode) => {
-                                        /*let watch = {
+                                        )?.episodes ?? []
+                                    ]
+                                        .flat()
+                                        .map((episode) => {
+                                            /*let watch = {
                                             time: History.getWatchTime(
                                                 this.props.match.params.id,
                                                 routeProps.match.params.season,
@@ -162,13 +172,13 @@ export default class Series extends React.Component<
                                             totalTime: 0
                                         };*/
 
-                                        return (
-                                            <Link
-                                                to={`./${episode.id}/`}
-                                                key={episode.id}
-                                            >
-                                                <Card
-                                                    /*marked={History.isUnwatched(
+                                            return (
+                                                <Link
+                                                    to={`./${episode.id}/`}
+                                                    key={episode.id}
+                                                >
+                                                    <Card
+                                                        /*marked={History.isUnwatched(
                                                         this.props.match.params
                                                             .id,
                                                         routeProps.match.params
@@ -176,8 +186,13 @@ export default class Series extends React.Component<
                                                         episode,
                                                         this.state.seasons
                                                     )}*/
-                                                    image={`url('https://img.youtube.com/vi/${episode?.videos?.ytid}/mqdefault.jpg')`}
-                                                    /*progress={
+                                                        image={`url('https://img.youtube.com/vi/${
+                                                            [
+                                                                episode.videos ??
+                                                                    []
+                                                            ].flat()?.[0]?.ytid
+                                                        }/mqdefault.jpg')`}
+                                                        /*progress={
                                                         History.isUnwatched(
                                                             this.props.match
                                                                 .params.id,
@@ -194,28 +209,34 @@ export default class Series extends React.Component<
                                                               )}%`
                                                     }
                                                     */
-                                                />
-                                            </Link>
-                                        );
-                                    })}
+                                                    />
+                                                </Link>
+                                            );
+                                        })}
                                 </div>
                             );
                         }}
                     />
                     <Route
                         path="/series/:id/:season/:episode/"
-                        render={(routeProps) =>
-                            this.state.series?.seasons
-                                ?.find(
+                        render={(routeProps) => {
+                            const season = [this.state.series?.seasons ?? []]
+                                .flat()
+                                .find(
                                     (season) =>
                                         season.id.toString() ===
                                         routeProps.match.params.season
-                                )
-                                ?.episodes?.find(
+                                );
+                            const episode = [season?.episodes ?? []]
+                                .flat()
+                                .find(
                                     (episode) =>
                                         episode.id.toString() ===
                                         routeProps.match.params.episode
-                                )?.videos ? (
+                                );
+                            const video = [episode?.videos ?? []].flat()[0];
+
+                            return video !== undefined ? (
                                 <Video
                                     id="ytplayer"
                                     title="ytplayer"
@@ -225,21 +246,7 @@ export default class Series extends React.Component<
                                     fs
                                     modestbranding
                                     origin="https://kztbl.codesandbox.io"
-                                    VIDEO_ID={
-                                        this.state.series?.seasons
-                                            ?.find(
-                                                (season) =>
-                                                    season.id.toString() ===
-                                                    routeProps.match.params
-                                                        .season
-                                            )
-                                            ?.episodes?.find(
-                                                (episode) =>
-                                                    episode.id.toString() ===
-                                                    routeProps.match.params
-                                                        .episode
-                                            )?.videos?.ytid
-                                    }
+                                    VIDEO_ID={video.ytid}
                                     yt={{
                                         onEnd: (e: unknown) => {
                                             this.end = true;
@@ -267,8 +274,8 @@ export default class Series extends React.Component<
                                         }
                                     }}
                                 />
-                            ) : null
-                        }
+                            ) : null;
+                        }}
                     />
                 </HashRouter>
             </div>
