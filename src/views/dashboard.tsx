@@ -10,6 +10,7 @@ import supabase from "../Supabase";
 
 type DashboardState = {
     series: Awaited<ReturnType<Dashboard["getSeries"]>>;
+    movies: Awaited<ReturnType<Dashboard["getMovies"]>>;
     //watched: unknown;
     history: Awaited<ReturnType<(typeof History)["getHistory"]>>;
 };
@@ -17,34 +18,41 @@ type DashboardState = {
 export default class Dashboard extends React.Component<{}, DashboardState> {
     state: DashboardState = {
         series: [],
+        movies: [],
         history: []
     };
 
     componentDidMount() {
-        supabase
-            .from("series")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(10)
-            .then((result) => {
-                this.setState(
-                    {
-                        series: result.data ?? []
-                    },
-                    () => this.loadWatched()
-                );
-            });
+        this.loadWatched();
+
+        this.getSeries().then((result) => this.setState({ series: result }));
+
+        this.getMovies().then((result) => this.setState({ movies: result }));
     }
 
     getSeries() {
         return supabase
             .from("series")
             .select("*")
+            .order("created_at", { ascending: false })
+            .limit(10)
             .then((response) => response.data ?? []);
     }
 
+    getMovies() {
+        return supabase
+            .from("movies")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(10)
+            .then((result) => result.data ?? []);
+    }
+
     loadWatched() {
-        History.getHistory()?.then((history) => this.setState({ history }));
+        History.getHistory()?.then((history) => {
+            console.log(history);
+            this.setState({ history });
+        });
         /*
         let watched = History.getUnwatched();
         console.log(watched, this.state.series);
@@ -122,12 +130,25 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                     episode?.seasons ?? []
                                 ].flat()[0];
                                 const series = [season?.series ?? []].flat()[0];
+                                const movie = [video?.movies ?? []].flat()[0];
 
                                 return (
                                     <Link
-                                        to={`/series/${series?.id}/${season?.id}/${episode?.id}/`}
-                                        key={`${series?.id}/${season?.id}/${episode?.id}`}
-                                        title={episode?.title}
+                                        to={
+                                            movie !== undefined
+                                                ? `/movies/${movie.id}/`
+                                                : `/series/${series?.id}/${season?.id}/${episode?.id}/`
+                                        }
+                                        key={
+                                            movie !== undefined
+                                                ? `/movies/${movie.id}/`
+                                                : `${series?.id}/${season?.id}/${episode?.id}`
+                                        }
+                                        title={
+                                            movie !== undefined
+                                                ? movie.title
+                                                : episode?.title
+                                        }
                                     >
                                         <Card
                                             image={`url('https://img.youtube.com/vi/${video?.ytid}/mqdefault.jpg')`}
@@ -143,7 +164,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                         </div>
                     </React.Fragment>
                 ) : null}
-                <h2>Recommended</h2>
+                <h2>Recently added shows</h2>
                 <div className="horizontal-list">
                     {this.state.series.map((series) => (
                         <Link to={`/series/${series.id}/`} key={series.id}>
@@ -178,14 +199,24 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                         </Link>
                     ))}
                 </div>
-                <h2>Dramas</h2>
+                <h2>Recently added movies</h2>
                 <div className="horizontal-list">
-                    <Poster marked />
-                    <Poster marked />
-                    <Poster marked />
-                    <Poster marked />
+                    {this.state.movies.map((movie) => (
+                        <Link to={`/movies/${movie.id}/`} key={movie.id}>
+                            <Poster
+                                marked={true}
+                                image={
+                                    "url('https://image.tmdb.org/t/p/w300/" +
+                                    //@ts-expect-error
+                                    movie.poster +
+                                    "')"
+                                }
+                                title={movie.title}
+                            />
+                        </Link>
+                    ))}
                 </div>
-                <h2>Recently added</h2>
+                <h2>Dramas</h2>
                 <div className="horizontal-list">
                     <Poster marked />
                     <Poster marked />
@@ -219,7 +250,6 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                             "url(https://www.themoviedb.org/t/p/original/dgMstu4lbtR9hznDYFhU7QR8cZr.jpg)"
                         }
                     />
-                    <Poster marked />
                     <Poster marked />
                     <Poster marked />
                     <Poster marked />
