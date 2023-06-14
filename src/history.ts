@@ -1,20 +1,23 @@
 import lockr from "lockr";
-import { episode_id } from "./dataTypes/episodes";
-import { season_id } from "./dataTypes/seasons";
-import { series_id } from "./dataTypes/series";
-import { video, video_id } from "./dataTypes/videos";
+import { episode } from "./dataTypes/episodes";
+import { season } from "./dataTypes/seasons";
+import { series } from "./dataTypes/series";
+import { video } from "./dataTypes/videos";
 import supabase from "./Supabase";
 import Supabase from "./Supabase/Supabase";
 
 lockr.prefix = "VidEye";
 
 export type HistoryEntry = {
-    video_id: video_id;
+    video_id: video["id"];
     created_at: string;
     updated_at: string;
     time: number | null;
     videos?: video;
 };
+
+/** @see https://stackoverflow.com/a/52331580 source */
+//type Unpacked<T> = T extends (infer U)[] ? U : T;
 
 /*
 function get(obj: {}, key: string, def?: any): unknown {
@@ -42,7 +45,7 @@ function set(obj: {}, key: string, val: any) {
 */
 
 export default class History {
-    public static markSeriesAsWatched(series: series_id) {
+    public static markSeriesAsWatched(series: series["id"]) {
         return supabase
             .from("videos")
             .select("id, episodes(id, seasons(id, series(id)))")
@@ -57,7 +60,7 @@ export default class History {
             });
     }
 
-    public static markSeasonAsWatched(season: season_id) {
+    public static markSeasonAsWatched(season: season["id"]) {
         return supabase
             .from("videos")
             .select("id, episodes(id, seasons(id))")
@@ -73,7 +76,7 @@ export default class History {
     }
 
     public static markEpisodeAsWatched(
-        episode: episode_id,
+        episode: episode["id"],
         time: HistoryEntry["time"] = null
     ) {
         return supabase
@@ -83,7 +86,7 @@ export default class History {
             .then((result) => {
                 this.upsert(
                     result.data?.map((video) =>
-                        this.makeHistoryEntry(video.id as video_id, time)
+                        this.makeHistoryEntry(video.id, time)
                     ) ?? []
                 );
                 return result.data;
@@ -91,14 +94,14 @@ export default class History {
     }
 
     public static markVideoAsWatched(
-        video: video_id,
+        video: video["id"],
         time: HistoryEntry["time"] = null
     ) {
         return this.upsert([this.makeHistoryEntry(video, time)]);
     }
 
     public static makeHistoryEntry(
-        video: video_id,
+        video: video["id"],
         time: HistoryEntry["time"] = null
     ): HistoryEntry {
         return {
@@ -114,14 +117,22 @@ export default class History {
             return supabase
                 .from("history")
                 .upsert(
-                    entries.map<Partial<HistoryEntry> & { id?: number }>(
-                        (entry: HistoryEntry & { id?: number }) => ({
+                    entries.map(
+                        (
+                            entry: HistoryEntry & {
+                                id?: number;
+                                user_id?: string;
+                            }
+                        ) => ({
                             time: entry.time,
                             updated_at: new Date().toISOString(),
                             video_id: entry.video_id,
                             ...((entry.id ?? null) === null
                                 ? {}
-                                : { id: entry.id })
+                                : { id: entry.id }),
+                            ...((entry.user_id ?? null) === null
+                                ? {}
+                                : { user_id: entry.user_id })
                         })
                     ),
                     {
@@ -132,7 +143,7 @@ export default class History {
                 )
                 .select()
                 .then(/*(result) => console.log(result)*/);
-        } else {
+        } /* else {
             const history = this.getLocalHistory();
             entries = entries.map((entry) => {
                 const historyEntry =
@@ -146,17 +157,17 @@ export default class History {
             });
             this.setLocalHistory(history);
             return history;
-        }
+        }*/
+        return null;
     }
 
-    public static getSeriesHistory(series: series_id) {
+    public static getSeriesHistory(series: series["id"]) {
         if (Supabase.isSignedIn()) {
             return supabase
                 .from("history")
-                .select(
-                    "id, videos(id, episodes(id, seasons(id, series(id))))"
-                );
-        } else {
+                .select("id, videos(id, episodes(id, seasons(id, series(id))))")
+                .then((response) => response.data ?? []);
+        } /* else {
             const history = this.getLocalHistory();
             return supabase
                 .from("videos")
@@ -166,50 +177,41 @@ export default class History {
                     this.getLocalHistory().map((entry) => entry.video_id)
                 )
                 .then((response) =>
-                    response.data?.reduce<Array<HistoryEntry>>(
-                        (previousValue, currentValue) => {
-                            previousValue.push(
-                                ...history
-                                    .filter(
-                                        (entry) =>
-                                            entry.video_id === currentValue.id
-                                    )
-                                    .map((entry) => ({
-                                        ...entry,
-                                        videos: currentValue as video
-                                    }))
-                            );
-                            return previousValue;
-                        },
-                        []
-                    )
+                    response.data?.reduce((previousValue, currentValue) => {
+                        previousValue.push(
+                            ...history
+                                .filter(
+                                    (entry) =>
+                                        entry.video_id === currentValue.id
+                                )
+                                .map((entry) => ({
+                                    ...entry,
+                                    videos: currentValue
+                                }))
+                        );
+                        return previousValue;
+                    }, [])
                 );
-        }
+        }*/
+        return null;
     }
 
-    public static getSeasonHistory(season: season_id) {
+    public static getSeasonHistory(season: season["id"]) {
         //
     }
 
-    public static getEpisodeHistory(episode: episode_id) {
+    public static getEpisodeHistory(episode: episode["id"]) {
         //
     }
 
-    public static getVideoHistory(video: video_id) {
+    public static getVideoHistory(video: video["id"]) {
         //
     }
 
-    public static getHistory(): PromiseLike<Array<HistoryEntry>> {
+    public static getHistory() /*: PromiseLike<Array<HistoryEntry>>*/ {
         if (Supabase.isSignedIn()) {
-            return supabase
-                .from("history")
-                .select(
-                    "*, videos(id, ytid, episodes(id, seasons(id, series(id))))"
-                )
-                .then(
-                    (response) => (response.data as HistoryEntry[] | null) ?? []
-                );
-        } else {
+            return this.getRemoteHistory();
+        } /* else {
             const history = this.getLocalHistory();
             return supabase
                 .from("videos")
@@ -220,26 +222,52 @@ export default class History {
                 )
                 .then(
                     (response) =>
-                        response.data?.reduce<Array<HistoryEntry>>(
-                            (previousValue, currentValue) => {
-                                previousValue.push(
-                                    ...history
-                                        .filter(
-                                            (entry) =>
-                                                entry.video_id ===
-                                                currentValue.id
-                                        )
-                                        .map((entry) => ({
-                                            ...entry,
-                                            videos: currentValue as video
-                                        }))
-                                );
-                                return previousValue;
-                            },
-                            []
-                        ) ?? []
+                        response.data?.reduce<
+                            Omit<
+                                Unpacked<
+                                    Awaited<
+                                        ReturnType<
+                                            (typeof History)["getRemoteHistory"]
+                                        >
+                                    >
+                                >,
+                                "id" | "user_id"
+                            >[]
+                        >((previousValue, currentValue) => {
+                            previousValue.push({
+                                //"id": 1,
+                                created_at: "",
+                                time: null,
+                                updated_at: "",
+                                //"user_id": null,
+                                video_id: 1,
+                                videos: null
+                            });
+                            previousValue.push(
+                                ...history
+                                    .filter(
+                                        (entry) =>
+                                            entry.video_id === currentValue.id
+                                    )
+                                    .map((entry) => ({
+                                        ...entry,
+                                        videos: currentValue
+                                    }))
+                            );
+                            return previousValue;
+                        }, []) ?? []
                 );
-        }
+        }*/
+        return null;
+    }
+
+    protected static getRemoteHistory() {
+        return supabase
+            .from("history")
+            .select(
+                "*, videos(id, ytid, episodes(id, title, seasons(id, series(id))))"
+            )
+            .then((response) => response.data ?? []);
     }
 
     protected static getLocalHistory() {
