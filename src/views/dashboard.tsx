@@ -24,6 +24,8 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
         supabase
             .from("series")
             .select("*")
+            .order("created_at", { ascending: false })
+            .limit(10)
             .then((result) => {
                 this.setState(
                     {
