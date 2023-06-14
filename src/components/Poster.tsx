@@ -2,21 +2,35 @@ import React from "react";
 import "./Poster.css";
 import ContextMenu, { ContextMenuItem } from "../contextMenu";
 
-export default class Poster extends React.Component {
-    state = {
-        counter: null,
-        watched: false
+type PosterProps = {
+    image?: string;
+    title?: string;
+    marked?: boolean;
+};
+
+type PosterState = {
+    counter: null;
+    //watched: boolean;
+    progress?: number;
+};
+
+export default class Poster extends React.Component<PosterProps, PosterState> {
+    state: PosterState = {
+        counter: null
+        //watched: false
     };
 
-    onContextMenu(e) {
+    root: HTMLDivElement | null = null;
+
+    onContextMenu(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
         e.preventDefault();
 
         const clickX = e.clientX;
         const clickY = e.clientY;
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
-        const rootW = this.root.offsetWidth;
-        const rootH = this.root.offsetHeight;
+        const rootW = this.root?.offsetWidth ?? 0;
+        const rootH = this.root?.offsetHeight ?? 0;
 
         const right = screenW - clickX > rootW;
         const left = !right;
@@ -60,7 +74,7 @@ export default class Poster extends React.Component {
     }
 
     render() {
-        var className = ["poster", this.state.watched ? "" : "marked"]
+        var className = ["poster", this.props.marked ? "marked" : ""]
             .filter((v) => v)
             .join(" ");
 
@@ -68,14 +82,16 @@ export default class Poster extends React.Component {
             <div
                 ref={(ref) => (this.root = ref)}
                 className={className}
-                style={{
-                    backgroundImage: this.props.image,
-                    "--card-progress": this.state.progress
-                }}
+                style={
+                    {
+                        backgroundImage: this.props.image,
+                        "--card-progress": this.state.progress
+                    } as React.CSSProperties
+                }
                 onContextMenu={this.onContextMenu.bind(this)}
                 title={this.props.title}
             >
-                {this.state.counter !== null || !this.state.watched ? (
+                {this.state.counter !== null || !this.props.marked ? (
                     <div className="posterCounter"></div>
                 ) : null}
             </div>
