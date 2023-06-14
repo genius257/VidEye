@@ -137,9 +137,7 @@ export default class Series extends React.Component<
                                                             ?.seasons
                                                     )}*/
                                                 image={`url('https://image.tmdb.org/t/p/w300/${season.poster}')`}
-                                            >
-                                                {season.id}
-                                            </Poster>
+                                            />
                                         </Link>
                                     ))}
                                 </div>
