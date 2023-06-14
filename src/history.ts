@@ -166,6 +166,7 @@ export default class History {
             return supabase
                 .from("history")
                 .select("id, videos(id, episodes(id, seasons(id, series(id))))")
+                .order("updated_at", { ascending: false })
                 .then((response) => response.data ?? []);
         } /* else {
             const history = this.getLocalHistory();
@@ -267,6 +268,7 @@ export default class History {
             .select(
                 "*, videos(id, ytid, episodes(id, title, seasons(id, series(id))))"
             )
+            .order("updated_at", { ascending: false })
             .then((response) => response.data ?? []);
     }
 
