@@ -2,30 +2,22 @@ import React from "react";
 import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
 //import moment from "moment";
 
-import History, { HistoryEntry } from "../history";
+import History /*, { HistoryEntry }*/ from "../history";
 import Card from "../card";
 import Poster from "../components/Poster";
 import supabase from "../Supabase";
-import { series } from "../dataTypes/series";
+//import { series } from "../dataTypes/series";
 
-export default class Dashboard extends React.Component<
-    {},
-    {
-        series: Array<series>;
-        watched: Array<unknown>;
-        history: Array<HistoryEntry>;
-    }
-> {
-    state = {
-        series: [] as Array<series>,
-        watched: [] as Array<{
-            series: string;
-            season: string;
-            episode: string;
-            time: number;
-            totalTime: number;
-        }>,
-        history: [] as Array<HistoryEntry>
+type DashboardState = {
+    series: Awaited<ReturnType<Dashboard["getSeries"]>>;
+    //watched: unknown;
+    history: Awaited<ReturnType<(typeof History)["getHistory"]>>;
+};
+
+export default class Dashboard extends React.Component<{}, DashboardState> {
+    state: DashboardState = {
+        series: [],
+        history: []
     };
 
     componentDidMount() {
@@ -35,15 +27,22 @@ export default class Dashboard extends React.Component<
             .then((result) => {
                 this.setState(
                     {
-                        series: (result.data as Array<series> | undefined) ?? []
+                        series: result.data ?? []
                     },
                     () => this.loadWatched()
                 );
             });
     }
 
+    getSeries() {
+        return supabase
+            .from("series")
+            .select("*")
+            .then((response) => response.data ?? []);
+    }
+
     loadWatched() {
-        History.getHistory().then((history) => this.setState({ history }));
+        History.getHistory()?.then((history) => this.setState({ history }));
         /*
         let watched = History.getUnwatched();
         console.log(watched, this.state.series);
@@ -108,28 +107,37 @@ export default class Dashboard extends React.Component<
     render() {
         return (
             <React.Fragment>
-                {this.state.history.length > 0 ? (
+                {this.state.history?.length ?? 0 > 0 ? (
                     <React.Fragment>
                         <h2>Continue watching</h2>
                         <div className="horizontal-list">
-                            {this.state.history.map((watch) => (
-                                <Link
-                                    to={`/series/${watch.videos?.episodes?.[0]?.seasons?.series?.id}/${watch.videos?.episodes?.[0]?.seasons?.id}/${watch.videos?.episodes?.[0]?.id}/`}
-                                    key={`${watch.videos?.episodes?.[0]?.seasons?.series?.id}/${watch.videos?.episodes?.[0]?.seasons?.id}/${watch.videos?.episodes?.[0]?.id}`}
-                                >
-                                    <Card
-                                        image={
-                                            watch.videos &&
-                                            `url('https://img.youtube.com/vi/${watch.videos.ytid}/mqdefault.jpg')`
-                                        }
-                                        progress={`${Math.round(
-                                            ((watch.time ?? 0) /
-                                                /*watch.totalTime*/ 0) *
-                                                100
-                                        )}%`}
-                                    />
-                                </Link>
-                            ))}
+                            {this.state.history?.map((watch) => {
+                                const video = [watch.videos ?? []].flat()[0];
+                                const episode = [
+                                    video?.episodes ?? []
+                                ].flat()[0];
+                                const season = [
+                                    episode?.seasons ?? []
+                                ].flat()[0];
+                                const series = [season?.series ?? []].flat()[0];
+
+                                return (
+                                    <Link
+                                        to={`/series/${series?.id}/${season?.id}/${episode?.id}/`}
+                                        key={`${series?.id}/${season?.id}/${episode?.id}`}
+                                        title={episode?.title}
+                                    >
+                                        <Card
+                                            image={`url('https://img.youtube.com/vi/${video?.ytid}/mqdefault.jpg')`}
+                                            progress={`${Math.round(
+                                                ((watch.time ?? 0) /
+                                                    /*watch.totalTime*/ 0) *
+                                                    100
+                                            )}%`}
+                                        />
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </React.Fragment>
                 ) : null}
@@ -139,12 +147,23 @@ export default class Dashboard extends React.Component<
                         <Link to={`/series/${series.id}/`} key={series.id}>
                             <Poster
                                 marked={
-                                    !this.state.history.some((entry) =>
-                                        entry.videos?.episodes?.some(
-                                            (episode) =>
-                                                episode?.seasons?.series_id ===
-                                                series.id
-                                        )
+                                    !this.state.history?.some((entry) =>
+                                        [
+                                            [entry.videos ?? []].flat()?.[0]
+                                                ?.episodes ?? []
+                                        ]
+                                            .flat()
+                                            .some(
+                                                (episode) =>
+                                                    [
+                                                        [
+                                                            episode?.seasons ??
+                                                                []
+                                                        ].flat()?.[0]?.series ??
+                                                            []
+                                                    ].flat()?.[0]?.id ===
+                                                    series.id
+                                            )
                                     )
                                 }
                                 image={
