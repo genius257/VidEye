@@ -165,7 +165,9 @@ export default class History {
         if (Supabase.isSignedIn()) {
             return supabase
                 .from("history")
-                .select("id, videos(id, episodes(id, seasons(id, series(id))))")
+                .select(
+                    "id, videos(id, episodes(id, seasons(id, series(id))), movies(id))"
+                )
                 .order("updated_at", { ascending: false })
                 .then((response) => response.data ?? []);
         } /* else {
@@ -266,7 +268,7 @@ export default class History {
         return supabase
             .from("history")
             .select(
-                "*, videos(id, ytid, episodes(id, title, seasons(id, series(id))))"
+                "*, videos(id, ytid, episodes(id, title, seasons(id, series(id))), movies(id, title))"
             )
             .order("updated_at", { ascending: false })
             .then((response) => response.data ?? []);
