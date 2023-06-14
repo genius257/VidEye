@@ -5,7 +5,6 @@ import YouTube, { YouTubePlayer, YouTubeProps } from "react-youtube";
 //import { HashRouter } from "react-router-dom";
 import { RouteComponentProps, withRouter } from "react-router";
 import History from "../history";
-import { episode_id } from "../dataTypes/episodes";
 
 // https://developers.google.com/youtube/player_parameters
 // https://www.maxlaumeister.com/blog/hide-related-videos-in-youtube-embeds/
@@ -50,13 +49,10 @@ type VideoProps = {
     VIDEO_ID?: string;
 
     yt?: YouTubeProps;
-};
+} & RouteComponentProps<{ id: string; season: string; episode: string }>;
 
 export default withRouter(
-    class Video extends React.Component<
-        RouteComponentProps<{ id: string; season: string; episode: string }> &
-            VideoProps
-    > {
+    class Video extends React.Component<VideoProps> {
         static defaultProps: {} = {
             autoplay: false,
 
@@ -72,14 +68,7 @@ export default withRouter(
       );*/
         }
 
-        componentDidUpdate(
-            prevProps: RouteComponentProps<{
-                id: string;
-                season: string;
-                episode: string;
-            }> &
-                VideoProps
-        ) {
+        componentDidUpdate(prevProps: VideoProps) {
             //this.player = null;
             //return super.componentDidUpdate(prevProps);
         }
@@ -104,37 +93,9 @@ export default withRouter(
 
             //History.setWatchTime(series, season, episode, time, duration);
             History.markEpisodeAsWatched(
-                parseInt(episode) as episode_id,
+                parseInt(episode),
                 time
                 //duration*/
-            );
-        }
-
-        generateURL() {
-            let options: Array<string> = [];
-            ["controls", "fs", "rel"].forEach((i) => {
-                if (!this.props[i]) {
-                    options.push(`${i}=0`);
-                }
-            });
-            [
-                "autoplay",
-                "cc_load_policy",
-                "disablekb",
-                "enablejsapi",
-                "loop",
-                "modestbranding",
-                "playsinline",
-                "showinfo"
-            ].forEach((i) => {
-                if (this.props[i]) {
-                    options.push(`${i}=1`);
-                }
-            });
-
-            return (
-                `https://www.youtube.com/embed/${this.props.VIDEO_ID}` +
-                (options.length > 0 ? "?" + options.join("&") : "")
             );
         }
 
@@ -146,16 +107,6 @@ export default withRouter(
 
         render() {
             return (
-                /*<iframe
-        id="ytplayer"
-        title="ytplayer"
-        type="text/html"
-        width="640"
-        height="360"
-        src={/*this.state.url* / this.generateURL()}
-        frameBorder="0"
-        allowFullScreen="allowFullScreen"
-      />*/
                 <YouTube
                     videoId={this.props.VIDEO_ID}
                     onReady={(e) => {
