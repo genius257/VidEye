@@ -207,7 +207,6 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                 marked={true}
                                 image={
                                     "url('https://image.tmdb.org/t/p/w300/" +
-                                    //@ts-expect-error
                                     movie.poster +
                                     "')"
                                 }
