@@ -96,6 +96,7 @@ export interface Database {
           deleted_at: string | null
           deleted_by: string | null
           id: number
+          poster: string | null
           title: string
           updated_at: string | null
           updated_by: string | null
@@ -107,6 +108,7 @@ export interface Database {
           deleted_at?: string | null
           deleted_by?: string | null
           id?: number
+          poster?: string | null
           title: string
           updated_at?: string | null
           updated_by?: string | null
@@ -118,12 +120,19 @@ export interface Database {
           deleted_at?: string | null
           deleted_by?: string | null
           id?: number
+          poster?: string | null
           title?: string
           updated_at?: string | null
           updated_by?: string | null
           video_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "movies_created_by_fkey"
+            columns: ["created_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "movies_video_id_fkey"
             columns: ["video_id"]
@@ -190,6 +199,7 @@ export interface Database {
       videos: {
         Row: {
           created_at: string | null
+          duration: number | null
           end_at: number | null
           id: number
           start_at: number | null
@@ -197,6 +207,7 @@ export interface Database {
         }
         Insert: {
           created_at?: string | null
+          duration?: number | null
           end_at?: number | null
           id?: number
           start_at?: number | null
@@ -204,6 +215,7 @@ export interface Database {
         }
         Update: {
           created_at?: string | null
+          duration?: number | null
           end_at?: number | null
           id?: number
           start_at?: number | null
