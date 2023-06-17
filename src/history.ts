@@ -212,9 +212,8 @@ export default class History {
     }
 
     public static getHistory() /*: PromiseLike<Array<HistoryEntry>>*/ {
-        if (Supabase.isSignedIn()) {
-            return this.getRemoteHistory();
-        } /* else {
+        return this.getRemoteHistory();
+        /*
             const history = this.getLocalHistory();
             return supabase
                 .from("videos")
@@ -260,7 +259,7 @@ export default class History {
                             return previousValue;
                         }, []) ?? []
                 );
-        }*/
+        */
         return null;
     }
 
