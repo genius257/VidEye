@@ -16,65 +16,40 @@ export default class Me extends React.Component<{}, { email: string | null }> {
     };
 
     render() {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    paddingTop: "20px"
-                }}
-            >
-                <OTP />
-            </div>
-        );
-
         let loggedIn = Supabase.isSignedIn();
         if (!loggedIn) {
-            if (this.state.email === null) {
-                return (
-                    <form
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            supabase.auth.signInWithOtp({
-                                //@ts-expect-error
-                                email: event.target.email.value,
-                                options: { shouldCreateUser: true }
-                            });
-                            //.then((value) => value.data);
-                            this.setState({
-                                //@ts-expect-error
-                                email: event.target.email.value
-                            });
-                            //@ts-expect-error
-                            event.target.email.value = "";
-                        }}
-                    >
-                        <input type="email" name="email" placeholder="E-mail" />
-                        <input type="submit" value="Login" />
-                    </form>
-                );
-            }
-
             return (
-                <form
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        supabase.auth.verifyOtp({
-                            email: this.state.email!,
-                            type: "email",
-                            //@ts-expect-error
-                            token: event.target.otp.value
-                        });
-                        //.then((value) => value.data);
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        paddingTop: "20px"
                     }}
                 >
-                    <input
-                        type="string"
-                        name="otp"
-                        placeholder="One time password"
+                    <OTP
+                        onMail={(email: string) => {
+                            this.setState({ email });
+                            return supabase.auth
+                                .signInWithOtp({
+                                    email: email,
+                                    options: { shouldCreateUser: true }
+                                })
+                                .then((value) => value.error === null);
+                        }}
+                        onCode={(otp: string) => {
+                            return supabase.auth
+                                .verifyOtp({
+                                    email: this.state.email!,
+                                    type: "email",
+                                    token: otp
+                                })
+                                .then(
+                                    (value) => value.error === null,
+                                    (reason) => false
+                                );
+                        }}
                     />
-                    <input type="submit" value="Login" />
-                </form>
+                </div>
             );
         }
 
