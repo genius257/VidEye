@@ -1,7 +1,13 @@
 import React from "react";
 import "./OTP.scss";
 
-export default class OTP extends React.Component<{}, { email: string | null }> {
+type OtpProps = {
+    onMail?: (email: string) => Promise<boolean>;
+    onCode?: (code: string) => Promise<boolean>;
+};
+type OtpState = { email: string | null };
+
+export default class OTP extends React.Component<OtpProps, OtpState> {
     state = {
         email: null
     };
@@ -31,14 +37,26 @@ export default class OTP extends React.Component<{}, { email: string | null }> {
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
-                            const form = event.target;
-                            const formData = new FormData(
-                                form as HTMLFormElement
-                            );
-                            this.setState({
-                                email: formData.get("email") as string
+                            const form = event.currentTarget;
+                            const formData = new FormData(form);
+
+                            const email = formData.get("email") as string;
+
+                            const promise =
+                                this.props.onMail?.(email) ??
+                                Promise.resolve(true);
+
+                            promise.then((success) => {
+                                if (success) {
+                                    this.setState({
+                                        email: formData.get("email") as string
+                                    });
+
+                                    form.reset();
+                                } else {
+                                    //TODO: show validation error message
+                                }
                             });
-                            (form as HTMLFormElement).reset();
                         }}
                     >
                         <input type="email" name="email" placeholder="Email" />
@@ -48,14 +66,24 @@ export default class OTP extends React.Component<{}, { email: string | null }> {
                     <form
                         onSubmit={(event) => {
                             event.preventDefault();
-                            const form = event.target;
-                            const formData = new FormData(
-                                form as HTMLFormElement
-                            );
-                            this.setState({
-                                email: formData.get("email") as string
+                            const form = event.currentTarget;
+                            const formData = new FormData(form);
+                            const otp = formData.get("otp") as string;
+
+                            const promise =
+                                this.props.onCode?.(otp) ??
+                                Promise.resolve(true);
+
+                            promise.then((success) => {
+                                if (success) {
+                                    this.setState({
+                                        email: formData.get("otp") as string
+                                    });
+                                    form.reset();
+                                } else {
+                                    //TODO: show validation error message
+                                }
                             });
-                            (form as HTMLFormElement).reset();
                         }}
                     >
                         <input
