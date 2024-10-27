@@ -75,7 +75,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                     //TODO: currently the order of the watched state array value is in an undertermanistic order due to async behavior. An index needs to be assigned, upon promise creation, to assign the result to the appropriate index.
                     jobs.push(
                         fetch(
-                            `https://www.googleapis.com/youtube/v3/videos?id=${YTID}&part=contentDetails&key=${process.env.REACT_APP_GOOGLE_CLOUD_API_KEY}`
+                            `https://www.googleapis.com/youtube/v3/videos?id=${YTID}&part=contentDetails&key=${import.meta.env.VITE_APP_GOOGLE_CLOUD_API_KEY}`
                         )
                             .then((response) => response.json())
                             .then((json) =>

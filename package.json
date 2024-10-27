@@ -6,6 +6,7 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@supabase/supabase-js": "2.12.1",
+    "@vitejs/plugin-react": "^4.3.3",
     "blueimp-md5": "^2.19.0",
     "firebase": "8.4.1",
     "lockr": "0.8.5",
@@ -15,9 +16,10 @@
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-router-dom": "5.0.1",
-    "react-scripts": "5.0.1",
     "react-youtube": "^10.1.0",
-    "ts-mixer": "5.4.0"
+    "ts-mixer": "5.4.0",
+    "vite": "^5.4.10",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "devDependencies": {
     "@types/blueimp-md5": "^2.18.0",
@@ -30,10 +32,10 @@
     "typescript": "4.9.3"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "tsc && vite build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "preview": "vite preview"
   },
   "browserslist": [
     ">0.2%",

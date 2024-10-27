@@ -3,8 +3,8 @@ import { Database } from "../types/supabase";
 
 // Create a single supabase client for interacting with your database
 const supabase = createClient<Database>(
-    process.env.REACT_APP_SUPABASE_URL!,
-    process.env.REACT_APP_SUPABASE_KEY!
+    import.meta.env.VITE_APP_SUPABASE_URL!,
+    import.meta.env.VITE_APP_SUPABASE_KEY!
 );
 
 export default supabase;
