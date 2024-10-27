@@ -1,4 +1,5 @@
 import History from "./history";
+import { it, expect } from "vitest";
 
 it("gets default viewtime, without crashing", function () {
     let uniqueObject = {};
