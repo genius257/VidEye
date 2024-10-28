@@ -6,6 +6,7 @@
   "main": "src/index.tsx",
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.3",
+    "appwrite": "^16.0.2",
     "blueimp-md5": "^2.19.0",
     "lockr": "0.8.5",
     "locutus": "2.0.11",
