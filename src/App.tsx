@@ -6,11 +6,11 @@ import DashboardView from "./views/dashboard";
 import SeriesView from "./views/series";
 import MoviesView from "./views/movies";
 import WatchView from "./views/watch";
+import Me from "./views/me";
 
 import ContextMenu from "./contextMenu";
-import Me from "./views/me";
 import Avatar from "./components/Avatar";
-import Auth from "./Supabase/Auth";
+import { UserProvider } from "./appwrite/context/user";
 
 // https://dribbble.com/shots/7061489-Netflix-Homepage-Redesign-Concept
 // https://dribbble.com/shots/4361663-Netflix-Redesign
@@ -84,13 +84,13 @@ export default class App extends React.Component {
                             </i>
                         </Link>
                         <Link to="/me/">
-                            <Auth>
+                            <UserProvider>
                                 <Avatar />
-                            </Auth>
+                            </UserProvider>
                         </Link>
                     </HashRouter>
                 </header>
-                <Auth>
+                <UserProvider>
                     <HashRouter>
                         <Switch>
                             <Route exact path="/" component={DashboardView} />
@@ -100,7 +100,7 @@ export default class App extends React.Component {
                             <Route path="/me/" component={Me} />
                         </Switch>
                     </HashRouter>
-                </Auth>
+                </UserProvider>
                 <footer>footer</footer>
                 <ContextMenu />
             </div>
