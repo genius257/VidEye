@@ -1,8 +1,8 @@
 import md5 from "blueimp-md5";
-import React from "react";
+import { Component } from "react";
 import "./Avatar.css";
 
-export default class Avatar extends React.Component {
+export default class Avatar extends Component {
     render() {
         const email = this.props?.auth?.user?.email;
         const hash =
