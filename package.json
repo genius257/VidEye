@@ -1,7 +1,7 @@
 {
   "name": "videye",
   "version": "1.0.0",
-  "description": "A streaming service experience powered by YouTube and Cloud Firestore",
+  "description": "A streaming service experience powered by YouTube and appwrite",
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
