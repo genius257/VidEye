@@ -1,24 +1,6 @@
 import React from "react";
 import ContextMenu, { ContextMenuItem } from "./contextMenu";
 
-/*const [
-  bindMenu,
-  bindMenuItem,
-  useContextTrigger,
-  { data, coords, setVisible }
-] = useContextMenu();*/
-
-/*const [bindTrigger] = useContextTrigger({
-  // those are the default values
-  disable: false, // disable the trigger
-  holdToDisplay: 1000, // time in ms after which the context menu will appear when holding the touch
-  posX: 0, // distance in pixel from which the context menu will appear related to the right click X coord
-  posY: 0, // distance in pixel from which the context menu will appear related to the right click y coord
-  mouseButton: useContextTrigger.MOUSE_BUTTON.RIGHT, // set to 0 for triggering the context menu with the left click
-  disableIfShiftIsPressed: false, // Self explanatory 😺
-  collect: () => "useContextMenu is cool!" // collect data to be passed to the context menu, see the example to see this in action
-});*/
-
 export default class Card extends React.Component<
     React.PropsWithChildren<{
         marked: boolean;
@@ -26,13 +8,6 @@ export default class Card extends React.Component<
         progress?: string;
     }>
 > {
-    /*const [
-    bindMenu,
-    bindMenuItem,
-    useContextTrigger,
-    { data, coords, setVisible }
-  ] = useContextMenu();*/
-
     static defaultProps = {
         marked: false
     };
