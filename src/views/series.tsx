@@ -120,7 +120,7 @@ export default class Series extends React.Component<
                         strict
                         path="/series/:id/"
                         render={(routeProps) => (
-                            <React.Fragment>
+                            <>
                                 <h1>{this.state.series?.title}</h1>
                                 <div className="horizontal-list">
                                     {seasons.map((season) => (
@@ -141,7 +141,7 @@ export default class Series extends React.Component<
                                         </Link>
                                     ))}
                                 </div>
-                            </React.Fragment>
+                            </>
                         )}
                     />
                     <Route

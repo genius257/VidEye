@@ -116,9 +116,9 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
 
     render() {
         return (
-            <React.Fragment>
+            <>
                 {this.state.history?.length ?? 0 > 0 ? (
-                    <React.Fragment>
+                    <>
                         <h2>Continue watching</h2>
                         <div className="horizontal-list">
                             {this.state.history?.map((watch) => {
@@ -162,7 +162,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                 );
                             })}
                         </div>
-                    </React.Fragment>
+                    </>
                 ) : null}
                 <h2>Recently added shows</h2>
                 <div className="horizontal-list">
@@ -256,7 +256,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                     <Poster marked />
                     <Poster marked />
                 </div>
-            </React.Fragment>
+            </>
         );
     }
 }
