@@ -1,4 +1,4 @@
-import React from "react";
+import { Component, ReactNode } from "react";
 import "./OTP.scss";
 
 type OtpProps = {
@@ -7,12 +7,12 @@ type OtpProps = {
 };
 type OtpState = { email: string | null };
 
-export default class OTP extends React.Component<OtpProps, OtpState> {
+export default class OTP extends Component<OtpProps, OtpState> {
     state = {
         email: null
     };
 
-    render(): React.ReactNode {
+    render(): ReactNode {
         return (
             <div className="otp">
                 <div className="navigation">
