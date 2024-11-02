@@ -12,11 +12,20 @@ import Video from "./video";
 import Card from "../card";
 //import moment from "moment";
 import Poster from "../components/Poster";
-import supabase from "../Supabase";
+import { databases } from "../appwrite";
+import { Query } from "appwrite";
 
 type SeriesState = {
     seasons: {};
     series: Awaited<ReturnType<Series["getSeries"]>>["data"];
+};
+
+const databaseId = "671eb9f3000ca1862380";
+
+const collectionIds = {
+    series: "671ec7fb000b3517b7e6",
+    movies: "671ec5e1002943b28df8",
+    history: "671eca420003af618870"
 };
 
 export default class Series extends React.Component<
@@ -97,6 +106,10 @@ export default class Series extends React.Component<
     }
 
     getSeries() {
+        return databases.listDocuments(databaseId, collectionIds.series, [
+            Query.equal("id", this.props.match.params.id),
+            Query.limit(1)
+        ]);
         return supabase
             .from("series")
             .select("*, seasons(*, episodes (*, videos (*)))")

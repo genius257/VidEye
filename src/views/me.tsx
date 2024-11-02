@@ -7,16 +7,20 @@ import OTP from "../components/OTP";
 //import Card from "../card";
 import Poster from "../components/Poster";
 import PosterGrid from "../components/PosterGrid";
-import supabase from "../Supabase";
-import Supabase from "../Supabase/Supabase";
+import { account, client } from "../appwrite";
+import { ID, Models } from "appwrite";
 
-export default class Me extends React.Component<{}, { email: string | null }> {
-    state: Readonly<{ email: string | null }> = {
-        email: null
+export default class Me extends React.Component<
+    {},
+    { email: string | null; token: Models.Token | null }
+> {
+    state: Readonly<{ email: string | null; token: Models.Token | null }> = {
+        email: null,
+        token: null
     };
 
     render() {
-        let loggedIn = Supabase.isSignedIn();
+        let loggedIn = /*Supabase.isSignedIn()*/ false;
         if (!loggedIn) {
             return (
                 <div
@@ -29,22 +33,23 @@ export default class Me extends React.Component<{}, { email: string | null }> {
                     <OTP
                         onMail={(email: string) => {
                             this.setState({ email });
-                            return supabase.auth
-                                .signInWithOtp({
-                                    email: email,
-                                    options: { shouldCreateUser: true }
-                                })
-                                .then((value) => value.error === null);
+                            return account
+                                .createEmailToken(ID.unique(), email)
+                                .then(
+                                    (value) => {
+                                        this.setState({ token: value });
+                                        return true;
+                                    },
+                                    (reason) => false
+                                );
                         }}
                         onCode={(otp: string) => {
-                            return supabase.auth
-                                .verifyOtp({
-                                    email: this.state.email!,
-                                    type: "email",
-                                    token: otp
-                                })
+                            return account
+                                .createSession(this.state.token!.userId, otp)
                                 .then(
-                                    (value) => value.error === null,
+                                    (value) => {
+                                        return true;
+                                    },
                                     (reason) => false
                                 );
                         }}
@@ -65,10 +70,11 @@ export default class Me extends React.Component<{}, { email: string | null }> {
                         lineHeight: "40px",
                         cursor: "pointer"
                     }}
-                    onClick={(event) => Supabase.signOut()}
+                    onClick={(event) => /*Supabase.signOut()*/ false}
                 >
                     sign out
                 </div>
+                <textarea></textarea>
                 <HashRouter>
                     <Switch>
                         <Route path="/" strict>

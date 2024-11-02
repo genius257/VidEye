@@ -5,7 +5,8 @@ import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
 import History /*, { HistoryEntry }*/ from "../history";
 import Card from "../card";
 import Poster from "../components/Poster";
-import supabase from "../Supabase";
+import { databases } from "../appwrite";
+import { Query } from "appwrite";
 //import { series } from "../dataTypes/series";
 
 type DashboardState = {
@@ -13,6 +14,14 @@ type DashboardState = {
     movies: Awaited<ReturnType<Dashboard["getMovies"]>>;
     //watched: unknown;
     history: Awaited<ReturnType<(typeof History)["getHistory"]>>;
+};
+
+const databaseId = "671eb9f3000ca1862380";
+
+const collectionIds = {
+    series: "671ec7fb000b3517b7e6",
+    movies: "671ec5e1002943b28df8",
+    history: "671eca420003af618870"
 };
 
 export default class Dashboard extends React.Component<{}, DashboardState> {
@@ -31,21 +40,21 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
     }
 
     getSeries() {
-        return supabase
-            .from("series")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(10)
-            .then((response) => response.data ?? []);
+        return databases
+            .listDocuments(databaseId, collectionIds.series, [
+                Query.orderDesc("created_at"),
+                Query.limit(10)
+            ])
+            .then((response) => response.documents ?? []);
     }
 
     getMovies() {
-        return supabase
-            .from("movies")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(10)
-            .then((result) => result.data ?? []);
+        return databases
+            .listDocuments(databaseId, collectionIds.movies, [
+                Query.orderDesc("created_at"),
+                Query.limit(10)
+            ])
+            .then((response) => response.documents ?? []);
     }
 
     loadWatched() {

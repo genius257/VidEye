@@ -3,8 +3,8 @@ import { episode } from "./dataTypes/episodes";
 import { season } from "./dataTypes/seasons";
 import { series } from "./dataTypes/series";
 import { video } from "./dataTypes/videos";
-import supabase from "./Supabase";
-import Supabase from "./Supabase/Supabase";
+import { databases } from "./appwrite";
+import { Query } from "appwrite";
 
 lockr.prefix = "VidEye";
 
@@ -44,8 +44,20 @@ function set(obj: {}, key: string, val: any) {
 }
 */
 
+const databaseId = '671eb9f3000ca1862380';
+
 export default class History {
     public static markSeriesAsWatched(series: series["id"]) {
+        return databases.listDocuments(databaseId, import.meta.env.VITE_APP_APPWRITE_DATABASE_HISTORY, [
+            Query.equal("episodes.seasons.series.id", series),
+        ]).then((response) => {
+            this.upsert(
+                response.documents?.map((entry) =>
+                    this.makeHistoryEntry(entry.video_id)
+                ) ?? []
+            );
+        });
+        /*
         return supabase
             .from("videos")
             .select("id, episodes(id, seasons(id, series(id)))")
@@ -57,10 +69,20 @@ export default class History {
                     ) ?? []
                 );
                 return result.data;
-            });
+            });*/
     }
 
     public static markSeasonAsWatched(season: season["id"]) {
+        return databases.listDocuments(databaseId, import.meta.env.VITE_APP_APPWRITE_DATABASE_HISTORY, [
+            Query.equal("episodes.seasons.id", season),
+        ]).then((response) => {
+            this.upsert(
+                response.documents?.map((entry) =>
+                    this.makeHistoryEntry(entry.video_id)
+                ) ?? []
+            );
+        });
+        /*
         return supabase
             .from("videos")
             .select("id, episodes(id, seasons(id))")
@@ -72,25 +94,22 @@ export default class History {
                     ) ?? []
                 );
                 return result.data;
-            });
+            });*/
     }
 
     public static markEpisodeAsWatched(
         episode: episode["id"],
         time: HistoryEntry["time"] = null
     ) {
-        return supabase
-            .from("videos")
-            .select("id, episodes!inner(id)")
-            .eq("episodes.id", episode)
-            .then((result) => {
-                this.upsert(
-                    result.data?.map((video) =>
-                        this.makeHistoryEntry(video.id, time)
-                    ) ?? []
-                );
-                return result.data;
-            });
+        return databases.listDocuments(databaseId, import.meta.env.VITE_APP_APPWRITE_DATABASE_HISTORY, [
+            Query.equal("episodes.id", episode),
+        ]).then((response) => {
+            this.upsert(
+                response.documents?.map((entry) =>
+                    this.makeHistoryEntry(entry.video_id, time)
+                ) ?? []
+            );
+        });
     }
 
     public static markVideoAsWatched(
@@ -113,6 +132,7 @@ export default class History {
     }
 
     protected static upsert(entries: Array<HistoryEntry>) {
+        /*
         if (Supabase.isSignedIn()) {
             return supabase
                 .from("history")
@@ -142,26 +162,31 @@ export default class History {
                     }
                 )
                 .select()
-                .then(/*(result) => console.log(result)*/);
-        } /* else {
-            const history = this.getLocalHistory();
-            entries = entries.map((entry) => {
-                const historyEntry =
-                    history.find(
-                        (historyEntry) =>
-                            historyEntry.video_id === entry.video_id
-                    ) ?? history[history.push(entry) - 1];
-                historyEntry.time = entry.time;
-                historyEntry.updated_at = entry.updated_at;
-                return historyEntry;
-            });
-            this.setLocalHistory(history);
-            return history;
-        }*/
+                .then(*//*(result) => console.log(result)*//*);
+} /* else {
+const history = this.getLocalHistory();
+entries = entries.map((entry) => {
+const historyEntry =
+history.find(
+(historyEntry) =>
+historyEntry.video_id === entry.video_id
+) ?? history[history.push(entry) - 1];
+historyEntry.time = entry.time;
+historyEntry.updated_at = entry.updated_at;
+return historyEntry;
+});
+this.setLocalHistory(history);
+return history;
+}*/
         return null;
     }
 
     public static getSeriesHistory(series: series["id"]) {
+        //FIXME: check if user is signed in
+        return databases.listDocuments(databaseId, import.meta.env.VITE_APP_APPWRITE_DATABASE_HISTORY, [
+            Query.orderDesc("updated_at"),
+        ]).then((response) => response.documents ?? []);
+        /*
         if (Supabase.isSignedIn()) {
             return supabase
                 .from("history")
@@ -170,7 +195,7 @@ export default class History {
                 )
                 .order("updated_at", { ascending: false })
                 .then((response) => response.data ?? []);
-        } /* else {
+        } *//* else {
             const history = this.getLocalHistory();
             return supabase
                 .from("videos")
@@ -264,13 +289,17 @@ export default class History {
     }
 
     protected static getRemoteHistory() {
+        return databases.listDocuments(databaseId, import.meta.env.VITE_APP_APPWRITE_DATABASE_HISTORY, [
+            Query.orderDesc("updated_at")
+        ]).then((response) => response.documents ?? []);
+        /*
         return supabase
             .from("history")
             .select(
                 "*, videos(id, ytid, episodes(id, title, seasons(id, series(id))), movies(id, title))"
             )
             .order("updated_at", { ascending: false })
-            .then((response) => response.data ?? []);
+            .then((response) => response.data ?? []);*/
     }
 
     protected static getLocalHistory() {
