@@ -55,7 +55,7 @@ export default class Card extends React.Component<
         const bottom = !top;
 
         ContextMenu.add(
-            <React.Fragment>
+            <>
                 <ContextMenuItem
                     onClick={(
                         e: React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -66,7 +66,7 @@ export default class Card extends React.Component<
                 <ContextMenuItem>Mark as unwatched</ContextMenuItem>
                 <ContextMenuItem disabled>Details</ContextMenuItem>
                 <ContextMenuItem>Something else</ContextMenuItem>
-            </React.Fragment>,
+            </>,
             e.pageX,
             e.pageY
         );
