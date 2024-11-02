@@ -1,10 +1,10 @@
-import React from "react";
+import { HTMLAttributes, PropsWithChildren } from "react";
 import "./PosterGrid.css";
 
 export default function PosterGrid({
     children,
     ...props
-}: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) {
+}: PropsWithChildren<HTMLAttributes<HTMLDivElement>>) {
     return (
         <div className="postergrid" {...props}>
             {children}
