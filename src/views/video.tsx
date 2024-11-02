@@ -91,7 +91,6 @@ export default withRouter(
 
             //let duration = this.player.getDuration();
 
-            //History.setWatchTime(series, season, episode, time, duration);
             History.markEpisodeAsWatched(
                 parseInt(episode),
                 time
@@ -109,7 +108,7 @@ export default withRouter(
             return (
                 <YouTube
                     videoId={this.props.VIDEO_ID}
-                    onReady={(e) => {
+                    onReady={(e: any) => {
                         this.player = e.target;
 
                         //let series = this.props.match.params.id;
