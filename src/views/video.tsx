@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 //import ReactDOM from "react-dom";
 //import PropTypes from "prop-types";
 import YouTube, { YouTubePlayer, YouTubeProps } from "react-youtube";
 //import { HashRouter } from "react-router-dom";
-import { RouteComponentProps, withRouter } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import History from "../history";
 
 // https://developers.google.com/youtube/player_parameters
@@ -49,98 +49,94 @@ type VideoProps = {
     VIDEO_ID?: string;
 
     yt?: YouTubeProps;
-} & RouteComponentProps<{ id: string; season: string; episode: string }>;
+};
 
-export default withRouter(
-    class Video extends React.Component<VideoProps> {
-        static defaultProps: {} = {
-            autoplay: false,
+export default function Video({
+    autoplay = false,
+    type = "text/html",
+    VIDEO_ID,
+    yt,
+    ...props
+}: VideoProps) {
+    const [player, setPlayer] = React.useState<YouTubePlayer | null>(null);
+    const {
+        id: series,
+        season,
+        episode
+    } = useParams<{ id: string; season: string; episode: string }>();
+    const navigate = useNavigate();
 
-            type: "text/html"
-        };
+    useEffect(() => {
+        // Anything in here is fired on component mount.
 
-        player: YouTubePlayer | null = null;
+        //Hook into the YT api and detect when video ends, to continue playing ot return to index.
+        /*ReactDOM.findDOMNode(this).addEventListener("statechange", e =>
+            console.log(e)
+        );*/
+        return () => {
+            // Anything in here is fired on component unmount.
 
-        componentDidMount() {
-            //Hook into the YT api and detect when video ends, to continue playing ot return to index.
-            /*ReactDOM.findDOMNode(this).addEventListener("statechange", e =>
-        console.log(e)
-      );*/
-        }
-
-        componentDidUpdate(prevProps: VideoProps) {
-            //this.player = null;
-            //return super.componentDidUpdate(prevProps);
-        }
-
-        componentWillUnmount() {
-            if (!this.player) {
+            if (player === null) {
                 return;
             }
 
-            let time = this.player.getCurrentTime();
+            let time = player.getCurrentTime();
 
             //if less than 30seconds occcured, play time not registered
             if (time < 30) {
                 return;
             }
 
-            //let series = this.props.match.params.id;
-            //let season = this.props.match.params.season;
-            let episode = this.props.match.params.episode;
-
             //let duration = this.player.getDuration();
+
+            if (episode === undefined) {
+                return;
+            }
 
             History.markEpisodeAsWatched(
                 parseInt(episode),
                 time
                 //duration*/
             );
-        }
+        };
+    }, []);
 
-        next() {
-            //FIXME: Get next episode from history class
-            this.props.history.push("../episode 02/");
-            //this.props.history.goBack();
-        }
+    const next = function () {
+        //FIXME: Get next episode from history class
+        navigate("../episode 02/");
+    };
 
-        render() {
-            return (
-                <YouTube
-                    videoId={this.props.VIDEO_ID}
-                    onReady={(e: any) => {
-                        this.player = e.target;
+    return (
+        <YouTube
+            videoId={VIDEO_ID}
+            onReady={(e: any) => {
+                setPlayer(e.target);
 
-                        //let series = this.props.match.params.id;
-                        //let season = this.props.match.params.season;
-                        //let episode = this.props.match.params.episode;
-                        let watchTime = 0; /*History.getWatchTime(
+                let watchTime = 0; /*History.getWatchTime(
                             series,
                             season,
                             episode,
                             0
                         );*/
 
-                        if (watchTime > 0) {
-                            this.player.seekTo(watchTime, true);
-                        }
-                    }}
-                    //onEnd={this.next.bind(this)}
-                    {...this.props.yt}
-                    opts={{
-                        playerVars: {
-                            autoplay: 1,
-                            controls: 1,
-                            disablekb: 1,
-                            fs: 1,
-                            modestbranding: 1,
-                            origin: "https://kztbl.codesandbox.io"
-                            //start: 1,
-                            //end: 365
-                        }
-                    }}
-                />
-            );
-        }
-    }
-);
+                if (watchTime > 0) {
+                    player.seekTo(watchTime, true);
+                }
+            }}
+            //onEnd={this.next.bind(this)}
+            {...yt}
+            opts={{
+                playerVars: {
+                    autoplay: 1,
+                    controls: 1,
+                    disablekb: 1,
+                    fs: 1,
+                    modestbranding: 1,
+                    origin: "https://kztbl.codesandbox.io"
+                    //start: 1,
+                    //end: 365
+                }
+            }}
+        />
+    );
+}

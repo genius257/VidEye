@@ -1,5 +1,5 @@
 import React from "react";
-import { HashRouter, Switch, Route /*, Link*/ } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import OTP from "../components/OTP";
 //import moment from "moment";
 
@@ -76,8 +76,8 @@ export default class Me extends React.Component<
                 </div>
                 <textarea></textarea>
                 <HashRouter>
-                    <Switch>
-                        <Route path="/" strict>
+                    <Routes>
+                        <Route path="/">
                             <div className="me">
                                 <div
                                     style={{
@@ -157,7 +157,7 @@ export default class Me extends React.Component<
                                 {/*</div>*/}
                             </div>
                         </Route>
-                    </Switch>
+                    </Routes>
                 </HashRouter>
             </>
         );

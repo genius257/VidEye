@@ -1,6 +1,6 @@
 import React from "react";
 
-import { HashRouter, Switch, Route, Link } from "react-router-dom";
+import { HashRouter, Route, Link, Routes } from "react-router-dom";
 
 import DashboardView from "./views/dashboard";
 import SeriesView from "./views/series";
@@ -92,13 +92,19 @@ export default class App extends React.Component {
                 </header>
                 <UserProvider>
                     <HashRouter>
-                        <Switch>
-                            <Route exact path="/" component={DashboardView} />
-                            <Route path="/series/:id/" component={SeriesView} />
-                            <Route path="/movies/:id/" component={MoviesView} />
-                            <Route path="/watch/:id/" component={WatchView} />
-                            <Route path="/me/" component={Me} />
-                        </Switch>
+                        <Routes>
+                            <Route path="/" element={<DashboardView />} />
+                            <Route
+                                path="/series/:id/"
+                                element={<SeriesView />}
+                            />
+                            <Route
+                                path="/movies/:id/"
+                                element={<MoviesView />}
+                            />
+                            <Route path="/watch/:id/" element={<WatchView />} />
+                            <Route path="/me/" element={<Me />} />
+                        </Routes>
                     </HashRouter>
                 </UserProvider>
                 <footer>footer</footer>
