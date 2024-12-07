@@ -76,8 +76,8 @@ export default class App extends React.Component {
     render() {
         return (
             <div className="App">
-                <header>
-                    <HashRouter>
+                <HashRouter>
+                    <header>
                         <Link to="/">
                             <i className="material-icons logo">
                                 play_circle_filled
@@ -88,14 +88,12 @@ export default class App extends React.Component {
                                 <Avatar />
                             </UserProvider>
                         </Link>
-                    </HashRouter>
-                </header>
-                <UserProvider>
-                    <HashRouter>
+                    </header>
+                    <UserProvider>
                         <Routes>
-                            <Route path="/" element={<DashboardView />} />
+                            <Route index path="/" element={<DashboardView />} />
                             <Route
-                                path="/series/:id/"
+                                path="/series/:id/:season?/:episode?/"
                                 element={<SeriesView />}
                             />
                             <Route
@@ -105,8 +103,8 @@ export default class App extends React.Component {
                             <Route path="/watch/:id/" element={<WatchView />} />
                             <Route path="/me/" element={<Me />} />
                         </Routes>
-                    </HashRouter>
-                </UserProvider>
+                    </UserProvider>
+                </HashRouter>
                 <footer>footer</footer>
                 <ContextMenu />
             </div>
