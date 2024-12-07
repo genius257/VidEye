@@ -176,7 +176,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                 <h2>Recently added shows</h2>
                 <div className="horizontal-list">
                     {this.state.series.map((series) => (
-                        <Link to={`/series/${series.id}/`} key={series.id}>
+                        <Link to={`/series/${series.$id}/`} key={series.$id}>
                             <Poster
                                 marked={
                                     !this.state.history?.some((entry) =>
@@ -194,7 +194,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                                         ].flat()?.[0]?.series ??
                                                             []
                                                     ].flat()?.[0]?.id ===
-                                                    series.id
+                                                    series.$id
                                             )
                                     )
                                 }
