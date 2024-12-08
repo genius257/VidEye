@@ -1,6 +1,6 @@
 # VidEye
 
-A streaming service experience powered by YouTube and Cloud Firestore
+A streaming service experience powered by YouTube and Appwrite
 
 ## Folders
 
