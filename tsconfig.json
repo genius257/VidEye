@@ -35,10 +35,5 @@
   },
   "include": [
     "src"
-  ],
-  "paths": {
-    "@Illuminate/*": [
-      "../merchant/Illuminate/*"
-    ]
-  }
+  ]
 }
