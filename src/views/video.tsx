@@ -62,17 +62,12 @@ export default function Video({
     const {
         id: series,
         season,
-        episode
+        episode,
     } = useParams<{ id: string; season: string; episode: string }>();
-    const navigate = useNavigate();
 
     useEffect(() => {
         // Anything in here is fired on component mount.
 
-        //Hook into the YT api and detect when video ends, to continue playing ot return to index.
-        /*ReactDOM.findDOMNode(this).addEventListener("statechange", e =>
-            console.log(e)
-        );*/
         return () => {
             // Anything in here is fired on component unmount.
 
@@ -95,16 +90,11 @@ export default function Video({
 
             History.markEpisodeAsWatched(
                 parseInt(episode),
-                time
+                time,
                 //duration*/
             );
         };
     }, []);
-
-    const next = function () {
-        //FIXME: Get next episode from history class
-        navigate("../episode 02/");
-    };
 
     return (
         <YouTube
@@ -120,22 +110,22 @@ export default function Video({
                         );*/
 
                 if (watchTime > 0) {
-                    player.seekTo(watchTime, true);
+                    e.target.seekTo(watchTime, true);
                 }
             }}
-            //onEnd={this.next.bind(this)}
+            className={props.className}
             {...yt}
             opts={{
                 playerVars: {
-                    autoplay: 1,
-                    controls: 1,
-                    disablekb: 1,
-                    fs: 1,
-                    modestbranding: 1,
-                    origin: "https://kztbl.codesandbox.io"
+                    autoplay: autoplay ? 1 : 0,
+                    controls: props.controls ? 1 : 0,
+                    disablekb: props.disablekb ? 1 : 0,
+                    fs: props.fs ? 1 : 0,
+                    modestbranding: props.modestbranding ? 1 : 0,
+                    origin: props.origin ?? "https://kztbl.codesandbox.io",
                     //start: 1,
                     //end: 365
-                }
+                },
             }}
         />
     );
