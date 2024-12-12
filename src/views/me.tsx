@@ -1,165 +1,219 @@
-import React from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
-import OTP from "../components/OTP";
-//import moment from "moment";
+import React, { useState } from "react";
+import { databaseIds, databases } from "../appwrite";
+import { ID } from "appwrite";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Episode, Series } from "@/types/models";
+import ViewentryField from "@/components/ViewentryField";
+import { X } from "lucide-react";
+import { useUser } from "@/appwrite/context/user";
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSeparator,
+    InputOTPSlot,
+} from "@/components/ui/input-otp";
 
-//import History from "../history";
-//import Card from "../card";
-import Poster from "../components/Poster";
-import PosterGrid from "../components/PosterGrid";
-import { account, client } from "../appwrite";
-import { ID, Models } from "appwrite";
+type VideoType = "movie" | "series";
 
-export default class Me extends React.Component<
-    {},
-    { email: string | null; token: Models.Token | null }
-> {
-    state: Readonly<{ email: string | null; token: Models.Token | null }> = {
-        email: null,
-        token: null
+type VideoEntry = {
+    ytid: string;
+    url: string;
+    title: string;
+    type: VideoType;
+    series?: Series;
+    season?: string;
+    episode?: string;
+    duration?: number;
+    start?: number;
+    end?: number;
+};
+
+const parseUrls = (input: string) => {
+    const urlRegex =
+        /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?(?:embed\/)?(?:v\/)?(?:shorts\/)?([^&\n?#]+)/g;
+    return Array.from(input.matchAll(urlRegex), (m) => ({
+        url: m[0]!,
+        id: m[1]!,
+    }));
+};
+
+const fetchVideoInfo = async (url: string): Promise<Partial<VideoEntry>> => {
+    //fetch(`https://www.googleapis.com/youtube/v3/videos?id=${url}&part=snippet&key=${import.meta.env.VITE_APP_GOOGLE_CLOUD_API_KEY}`);
+    return fetch(`https://noembed.com/embed?url=${url}`)
+        .then((response) => response.json())
+        .then((data) => {
+            return { title: data?.title };
+        });
+};
+
+export default function Me() {
+    const [urls, setUrls] = useState("");
+    const [videoEntries, setVideoEntries] = useState<VideoEntry[]>([]);
+    const user = useUser();
+    const [email, setEmail] = useState<string>("");
+    const [otp, setOtp] = useState<string>("");
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const parsedUrls = parseUrls(urls);
+        const newEntries: VideoEntry[] = [];
+
+        Promise.all(
+            parsedUrls.map((oUrl) =>
+                fetchVideoInfo(oUrl.url).then((info) => {
+                    newEntries.push({
+                        ytid: oUrl.id,
+                        url: oUrl.url,
+                        title: info.title ?? "Unknown",
+                        type: "movie", // Default to movie
+                    });
+                }),
+            ),
+        ).then(() => {
+            setVideoEntries([...videoEntries, ...newEntries]);
+            setUrls("");
+        });
     };
 
-    render() {
-        let loggedIn = /*Supabase.isSignedIn()*/ false;
-        if (!loggedIn) {
-            return (
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        paddingTop: "20px"
+    return (
+        <div className="container mx-auto p-4 max-w-2xl">
+            {user?.current ? (
+                "current user"
+            ) : user?.token === null ? (
+                <form
+                    className="space-y-4"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        user.createEmailToken(email);
                     }}
                 >
-                    <OTP
-                        onMail={(email: string) => {
-                            this.setState({ email });
-                            return account
-                                .createEmailToken(ID.unique(), email)
-                                .then(
-                                    (value) => {
-                                        this.setState({ token: value });
-                                        return true;
-                                    },
-                                    (reason) => false
-                                );
-                        }}
-                        onCode={(otp: string) => {
-                            return account
-                                .createSession(this.state.token!.userId, otp)
-                                .then(
-                                    (value) => {
-                                        return true;
-                                    },
-                                    (reason) => false
-                                );
-                        }}
+                    <Input
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <Button type="submit" className="w-full">
+                        Login
+                    </Button>
+                </form>
+            ) : (
+                <InputOTP
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => {
+                        setOtp(e);
+                        if (e.length === 6) {
+                            user?.createSession(e);
+                        }
+                    }}
+                >
+                    <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                        <InputOTPSlot index={2} />
+                        <InputOTPSlot index={3} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                </InputOTP>
+            )}
+
+            <h1 className="text-2xl font-bold mb-4">Add Videos</h1>
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                    <Label>YouTube URLs (one per line)</Label>
+                    <Textarea
+                        value={urls}
+                        onChange={(event) => setUrls(event.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        rows={5}
                     />
                 </div>
-            );
-        }
-
-        return (
-            <>
-                <div
-                    style={{
-                        width: "190px",
-                        height: "40px",
-                        backgroundColor: "#c33",
-                        textAlign: "center",
-                        verticalAlign: "center",
-                        lineHeight: "40px",
-                        cursor: "pointer"
-                    }}
-                    onClick={(event) => /*Supabase.signOut()*/ false}
-                >
-                    sign out
-                </div>
-                <textarea></textarea>
-                <HashRouter>
-                    <Routes>
-                        <Route path="/">
-                            <div className="me">
-                                <div
-                                    style={{
-                                        gridArea: "a",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        cursor: "pointer"
-                                    }}
+                <Button type="submit" className="w-full" disabled={urls === ""}>
+                    Add Videos
+                </Button>
+            </form>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    videoEntries.forEach((entry) => {
+                        databases.createDocument(
+                            "671eb9f3000ca1862380",
+                            databaseIds.episodes,
+                            ID.unique(),
+                            {
+                                episode:
+                                    entry.episode !== undefined
+                                        ? parseInt(entry.episode)
+                                        : undefined,
+                                title: entry.title,
+                                created_at: "",
+                                // @ts-expect-error Currently the type is not finalized, and is cuzrrently using the response type isntead of the more dynamic upsert type
+                                video: {
+                                    ytid: entry.ytid,
+                                    duration: entry.duration!,
+                                    created_at: "",
+                                    start_at: 0,
+                                    end_at: 0,
+                                },
+                                season: entry.series?.seasons?.find(
+                                    (season) =>
+                                        season.season ===
+                                        parseInt(entry.season!),
+                                )?.$id,
+                            } satisfies Partial<Episode>,
+                        );
+                    });
+                }}
+            >
+                <div className="mt-8 space-y-6">
+                    {videoEntries.map((entry, index) => (
+                        <div className="border p-4 rounded-md space-y-4">
+                            <div className="flex space-x-2 justify-end">
+                                <Button
+                                    size={"icon"}
+                                    className="w-10 h-10"
+                                    onClick={() =>
+                                        setVideoEntries(
+                                            videoEntries.filter(
+                                                (_, i) => i !== index,
+                                            ),
+                                        )
+                                    }
                                 >
-                                    <i
-                                        className="material-icons"
-                                        style={{
-                                            color: "#00AA00",
-                                            fontSize: "5em"
-                                        }}
-                                    >
-                                        add_circle
-                                    </i>
-                                </div>
-                                <div
-                                    style={{
-                                        gridArea: "b",
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        cursor: "pointer"
-                                    }}
-                                >
-                                    <i
-                                        className="material-icons"
-                                        style={{
-                                            color: "#AA0000",
-                                            fontSize: "5em"
-                                        }}
-                                    >
-                                        delete
-                                    </i>
-                                </div>
-                                <h1 style={{ gridArea: "header" }}>
-                                    Your requests
-                                </h1>
-                                <PosterGrid
-                                    style={{ gridArea: "my-request-list" }}
-                                >
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                </PosterGrid>
-                                <h1 style={{ gridArea: "header2" }}>
-                                    Requests
-                                </h1>
-                                {/*<div className="grid-list" style={{ gridArea: "request-list" }}>*/}
-                                <PosterGrid
-                                    style={{ gridArea: "request-list" }}
-                                >
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                    <Poster />
-                                </PosterGrid>
-                                {/*</div>*/}
+                                    <X className="w-4 h-4" />
+                                </Button>
                             </div>
-                        </Route>
-                    </Routes>
-                </HashRouter>
-            </>
-        );
-    }
+                            <ViewentryField
+                                ytid={entry.ytid}
+                                key={index}
+                                className="space-y-4"
+                                onValueChange={(value) => {
+                                    setVideoEntries(
+                                        videoEntries.toSpliced(index, 1, value),
+                                    );
+                                }}
+                            />
+                        </div>
+                    ))}
+                </div>
+                <Button
+                    type="submit"
+                    className="w-full mt-4"
+                    disabled={videoEntries.length === 0}
+                >
+                    Save
+                </Button>
+            </form>
+        </div>
+    );
 }
