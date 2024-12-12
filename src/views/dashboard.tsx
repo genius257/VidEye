@@ -1,13 +1,12 @@
 import React from "react";
-import { /*HashRouter, Switch, Route,*/ Link } from "react-router-dom";
-//import moment from "moment";
+import { Link } from "react-router-dom";
 
-import History /*, { HistoryEntry }*/ from "../history";
+import History from "../history";
 import Card from "../card";
 import Poster from "../components/Poster";
 import { databases } from "../appwrite";
 import { Query } from "appwrite";
-//import { series } from "../dataTypes/series";
+import { Series } from "@/types/models";
 
 type DashboardState = {
     series: Awaited<ReturnType<Dashboard["getSeries"]>>;
@@ -21,14 +20,14 @@ const databaseId = "671eb9f3000ca1862380";
 const collectionIds = {
     series: "671ec7fb000b3517b7e6",
     movies: "671ec5e1002943b28df8",
-    history: "671eca420003af618870"
+    history: "671eca420003af618870",
 };
 
 export default class Dashboard extends React.Component<{}, DashboardState> {
     state: DashboardState = {
         series: [],
         movies: [],
-        history: []
+        history: [],
     };
 
     componentDidMount() {
@@ -39,20 +38,20 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
         this.getMovies().then((result) => this.setState({ movies: result }));
     }
 
-    getSeries() {
+    getSeries(): Promise<Series[]> {
         return databases
             .listDocuments(databaseId, collectionIds.series, [
                 Query.orderDesc("created_at"),
-                Query.limit(10)
+                Query.limit(10),
             ])
-            .then((response) => response.documents ?? []);
+            .then((response) => response.documents ?? []) as Promise<Series[]>;
     }
 
     getMovies() {
         return databases
             .listDocuments(databaseId, collectionIds.movies, [
                 Query.orderDesc("created_at"),
-                Query.limit(10)
+                Query.limit(10),
             ])
             .then((response) => response.documents ?? []);
     }
@@ -133,10 +132,10 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                             {this.state.history?.map((watch) => {
                                 const video = [watch.videos ?? []].flat()[0];
                                 const episode = [
-                                    video?.episodes ?? []
+                                    video?.episodes ?? [],
                                 ].flat()[0];
                                 const season = [
-                                    episode?.seasons ?? []
+                                    episode?.seasons ?? [],
                                 ].flat()[0];
                                 const series = [season?.series ?? []].flat()[0];
                                 const movie = [video?.movies ?? []].flat()[0];
@@ -164,7 +163,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                             progress={`${Math.round(
                                                 ((watch.time ?? 0) /
                                                     /*watch.totalTime*/ 0) *
-                                                    100
+                                                    100,
                                             )}%`}
                                         />
                                     </Link>
@@ -182,7 +181,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                     !this.state.history?.some((entry) =>
                                         [
                                             [entry.videos ?? []].flat()?.[0]
-                                                ?.episodes ?? []
+                                                ?.episodes ?? [],
                                         ]
                                             .flat()
                                             .some(
@@ -190,12 +189,12 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                                     [
                                                         [
                                                             episode?.seasons ??
-                                                                []
+                                                                [],
                                                         ].flat()?.[0]?.series ??
-                                                            []
+                                                            [],
                                                     ].flat()?.[0]?.id ===
-                                                    series.$id
-                                            )
+                                                    series.$id,
+                                            ),
                                     )
                                 }
                                 image={
