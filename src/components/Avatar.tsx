@@ -1,13 +1,12 @@
 import md5 from "blueimp-md5";
 import { Component, useEffect, useState } from "react";
-import "./Avatar.css";
 import { useUser } from "@/appwrite/context/user";
 import { account } from "@/appwrite";
 
 export default function Avatar() {
     const user = useUser();
     const [photoURL, setPhotoURL] = useState(
-        "https://www.gravatar.com/avatar/"
+        "https://www.gravatar.com/avatar/",
     );
     const [displayName, setDisplayName] = useState("Anonymous");
     useEffect(() => {
@@ -29,7 +28,7 @@ export default function Avatar() {
 
     return (
         <div
-            className="avatar"
+            className="h-12 w-12 rounded-full bg-cover bg-center"
             style={{ backgroundImage: `url(${photoURL})` }}
             title={displayName}
         />
