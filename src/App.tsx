@@ -75,15 +75,21 @@ import { UserProvider } from "./appwrite/context/user";
 export default class App extends React.Component {
     render() {
         return (
-            <div className="App">
+            <div className="App h-screen flex flex-col">
                 <HashRouter>
-                    <header>
-                        <Link to="/">
-                            <i className="material-icons logo">
+                    <header className="bg-red-600 flex flex-row justify-between content-center">
+                        <Link
+                            to="/"
+                            className="flex justify-center items-center p-2"
+                        >
+                            <i className="material-icons text-5xl">
                                 play_circle_filled
                             </i>
                         </Link>
-                        <Link to="/me/">
+                        <Link
+                            to="/me/"
+                            className="flex justify-center items-center p-2"
+                        >
                             <UserProvider>
                                 <Avatar />
                             </UserProvider>
@@ -105,7 +111,6 @@ export default class App extends React.Component {
                         </Routes>
                     </UserProvider>
                 </HashRouter>
-                <footer>footer</footer>
                 <ContextMenu />
             </div>
         );
