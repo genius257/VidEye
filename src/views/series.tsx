@@ -5,7 +5,7 @@ import Video from "./video";
 //import History from "../history";
 import Card from "../card";
 import Poster from "../components/Poster";
-import { databases } from "../appwrite";
+import { collectionIds, databases } from "../appwrite";
 import { Models, Query } from "appwrite";
 import { Season, Series } from "../types/models";
 
@@ -15,14 +15,6 @@ type SeriesState = {
 };
 
 const databaseId = "671eb9f3000ca1862380";
-
-const collectionIds = {
-    series: "671ec7fb000b3517b7e6",
-    seasons: "671ecb800036fac028e0",
-    movies: "671ec5e1002943b28df8",
-    history: "671eca420003af618870",
-    episodes: "671ec5a900219da44149",
-};
 
 export default function () {
     const { id, season, episode } = useParams<{

@@ -8,7 +8,7 @@ const account = new Account(client);
 
 const databases = new Databases(client);
 
-const databaseIds = {
+const collectionIds = {
     series: "671ec7fb000b3517b7e6",
     seasons: "671ecb800036fac028e0",
     movies: "671ec5e1002943b28df8",
@@ -20,5 +20,5 @@ export {
     client,
     account,
     databases,
-    databaseIds,
+    collectionIds,
 };

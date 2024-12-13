@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "./ui/select";
-import { databaseIds, databases } from "@/appwrite";
+import { collectionIds, databases } from "@/appwrite";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Cross, Plus, X } from "lucide-react";
@@ -64,14 +64,14 @@ export default function ViewentryField({
         switch (videoInfo.type) {
             case "series":
                 databases
-                    .listDocuments("671eb9f3000ca1862380", databaseIds.series)
+                    .listDocuments("671eb9f3000ca1862380", collectionIds.series)
                     .then((response) =>
                         setSeries(response.documents as Series[]),
                     );
                 break;
             case "movie":
                 databases
-                    .listDocuments("671eb9f3000ca1862380", databaseIds.movies)
+                    .listDocuments("671eb9f3000ca1862380", collectionIds.movies)
                     .then((response) =>
                         setMovies(response.documents as Movie[]),
                     );

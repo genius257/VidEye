@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { databaseIds, databases } from "../appwrite";
+import { collectionIds, databases } from "../appwrite";
 import { ID } from "appwrite";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -148,7 +148,7 @@ export default function Me() {
                     videoEntries.forEach((entry) => {
                         databases.createDocument(
                             "671eb9f3000ca1862380",
-                            databaseIds.episodes,
+                            collectionIds.episodes,
                             ID.unique(),
                             {
                                 episode:
