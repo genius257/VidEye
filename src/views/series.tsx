@@ -97,18 +97,19 @@ export default function () {
 
     if (episode === undefined) {
         return (
-            <div x-className="horizontal-list" className="flex flex-wrap gap-4">
+            <div className="container flex flex-wrap flex-col gap-4 container mx-auto p-4">
                 <div>
                     <Poster
                         image={`url('https://image.tmdb.org/t/p/w300/${seasondata?.poster}')`}
                     />
                 </div>
-                {(
-                    seasondata?.episodes?.toSorted(
-                        (a, b) => a.episode - b.episode,
-                    ) ?? []
-                ).map((episode) => {
-                    /*let watch = {
+                <div className="flex flex-row flex-wrap gap-4">
+                    {(
+                        seasondata?.episodes?.toSorted(
+                            (a, b) => a.episode - b.episode,
+                        ) ?? []
+                    ).map((episode) => {
+                        /*let watch = {
                     time: History.getWatchTime(
                         this.props.match.params.id,
                         routeProps.match.params.season,
@@ -118,10 +119,10 @@ export default function () {
                     totalTime: 0
                 };*/
 
-                    return (
-                        <Link to={`./${episode.$id}/`} key={episode.$id}>
-                            <Card
-                                /*marked={History.isUnwatched(
+                        return (
+                            <Link to={`./${episode.$id}/`} key={episode.$id}>
+                                <Card
+                                    /*marked={History.isUnwatched(
                                 this.props.match.params
                                     .id,
                                 routeProps.match.params
@@ -129,8 +130,8 @@ export default function () {
                                 episode,
                                 this.state.seasons
                             )}*/
-                                image={`url('https://img.youtube.com/vi/${episode?.video?.ytid}/mqdefault.jpg')`}
-                                /*progress={
+                                    image={`url('https://img.youtube.com/vi/${episode?.video?.ytid}/mqdefault.jpg')`}
+                                    /*progress={
                                 History.isUnwatched(
                                     this.props.match
                                         .params.id,
@@ -147,12 +148,13 @@ export default function () {
                                       )}%`
                             }
                             */
-                            />
-                            <div>{episode.title}</div>
-                            <div>Episode {episode.episode}</div>
-                        </Link>
-                    );
-                })}
+                                />
+                                <div>{episode.title}</div>
+                                <div>Episode {episode.episode}</div>
+                            </Link>
+                        );
+                    })}
+                </div>
             </div>
         );
     }
