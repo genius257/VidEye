@@ -89,8 +89,6 @@
   background: rgba(0, 0, 0, 0.3);
   width: 210px;
   width: var(--card-width);
-  height: 120px;
-  height: var(--card-height);
   background-size: var(--card-width) var(--card-height);
   background-size: contain;
   background-position: center;

@@ -9,7 +9,7 @@ export default class Card extends React.Component<
     }>
 > {
     static defaultProps = {
-        marked: false
+        marked: false,
     };
 
     root: HTMLDivElement | null = null;
@@ -33,7 +33,7 @@ export default class Card extends React.Component<
             <>
                 <ContextMenuItem
                     onClick={(
-                        e: React.MouseEvent<HTMLDivElement, MouseEvent>
+                        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
                     ) => console.log("mark as watched")}
                 >
                     Mark as watched
@@ -43,7 +43,7 @@ export default class Card extends React.Component<
                 <ContextMenuItem>Something else</ContextMenuItem>
             </>,
             e.pageX,
-            e.pageY
+            e.pageY,
         );
 
         //this.root.style.display = "absolute";
@@ -68,7 +68,11 @@ export default class Card extends React.Component<
     }
 
     render() {
-        let className = ["card", this.props.marked ? "marked" : ""]
+        let className = [
+            "card",
+            "aspect-video",
+            this.props.marked ? "marked" : "",
+        ]
             .filter((a) => a)
             .join(" ");
 
@@ -79,7 +83,7 @@ export default class Card extends React.Component<
                 style={{
                     backgroundImage: this.props.image,
                     //@ts-ignore
-                    "--card-progress": this.props.progress
+                    "--card-progress": this.props.progress,
                 }}
                 onContextMenu={this.onContextMenu.bind(this)}
             >
