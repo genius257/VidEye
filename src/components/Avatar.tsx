@@ -1,5 +1,5 @@
 import md5 from "blueimp-md5";
-import { Component, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "@/appwrite/context/user";
 import { account } from "@/appwrite";
 
