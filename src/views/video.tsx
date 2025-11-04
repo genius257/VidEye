@@ -121,7 +121,7 @@ export default function Video({
                     controls: props.controls ? 1 : 0,
                     disablekb: props.disablekb ? 1 : 0,
                     fs: props.fs ? 1 : 0,
-                    modestbranding: props.modestbranding ? 1 : 0,
+                    modestbranding: props.modestbranding ? 1 : undefined,
                     origin: props.origin ?? "https://kztbl.codesandbox.io",
                     //start: 1,
                     //end: 365
