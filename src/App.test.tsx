@@ -1,7 +1,6 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { it, expect } from "vitest";
+import { it } from "vitest";
 
 // https://jestjs.io/docs/en/tutorial-react
 
