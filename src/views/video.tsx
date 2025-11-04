@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 //import PropTypes from "prop-types";
 import YouTube, { YouTubePlayer, YouTubeProps } from "react-youtube";
 //import { HashRouter } from "react-router-dom";
-import { useNavigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import History from "../history";
 
 // https://developers.google.com/youtube/player_parameters
@@ -60,8 +60,8 @@ export default function Video({
 }: VideoProps) {
     const [player, setPlayer] = React.useState<YouTubePlayer | null>(null);
     const {
-        id: series,
-        season,
+        // id: series,
+        // season,
         episode,
     } = useParams<{ id: string; season: string; episode: string }>();
 
