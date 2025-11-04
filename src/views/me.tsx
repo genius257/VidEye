@@ -169,7 +169,7 @@ export default function Me() {
                                     (season) =>
                                         season.season ===
                                         parseInt(entry.season!),
-                                )?.$id,
+                                ),
                             } satisfies Partial<Episode>,
                         );
                     });
