@@ -14,8 +14,8 @@ type PosterProps = {
 };
 
 export default function Poster({ title, image, marked }: PosterProps) {
-    const [counter, setCounter] = useState(null);
-    const [progress, setProgress] = useState(0);
+    const [counter /*, setCounter*/] = useState(null);
+    const [progress /*, setProgress*/] = useState(0);
 
     const ref = useRef<HTMLDivElement>(null);
 
