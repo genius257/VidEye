@@ -2,7 +2,7 @@ import { tmdb } from "@/tmdb";
 import { Series, Movie } from "@/types/models";
 import Video from "@/views/video";
 import { HTMLProps, useEffect, useState } from "react";
-import { MovieDetails, SeasonDetails, TvShowDetails } from "tmdb-ts";
+import { /*MovieDetails,*/ SeasonDetails, TvShowDetails } from "tmdb-ts";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import {
@@ -14,8 +14,8 @@ import {
 } from "./ui/select";
 import { collectionIds, databases } from "@/appwrite";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Cross, Plus, X } from "lucide-react";
+// import { Button } from "./ui/button";
+// import { Cross, Plus, X } from "lucide-react";
 
 type VideoType = "movie" | "series";
 
@@ -48,10 +48,10 @@ export default function ViewentryField({
         type: "movie",
     });
     const [series, setSeries] = useState<Series[]>([]);
-    const [movies, setMovies] = useState<Movie[]>([]);
+    const [, /*movies*/ setMovies] = useState<Movie[]>([]);
     const [seriesData, setSeriesData] = useState<TvShowDetails | null>(null);
     const [seasonData, setSeasonData] = useState<SeasonDetails | null>(null);
-    const [movieData, setMovieData] = useState<MovieDetails | null>(null);
+    // const [movieData, setMovieData] = useState<MovieDetails | null>(null);
 
     useEffect(() => {
         if (onValueChange) {
