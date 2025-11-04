@@ -1,50 +1,44 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import Video from "./video";
-import { RouteComponentProps } from "react-router-dom";
 import { databases } from "../appwrite";
 import { Query } from "appwrite";
-
-type MoviesProps = {} & RouteComponentProps<{ id: string }>;
-type MoviesState = {
-    play: boolean;
-    movie: Awaited<ReturnType<Series["getMovie"]>>;
-};
+import { useParams } from "react-router-dom";
 
 const databaseId = "671eb9f3000ca1862380";
 
 const collectionIds = {
     series: "671ec7fb000b3517b7e6",
     movies: "671ec5e1002943b28df8",
-    history: "671eca420003af618870"
+    history: "671eca420003af618870",
 };
 
-export default class Series extends React.Component<MoviesProps, MoviesState> {
-    state: Readonly<MoviesState> = {
-        play: false,
-        movie: null
-    };
+function getMovie(id: string) {
+    return databases
+        .listDocuments(databaseId, collectionIds.movies, [
+            Query.equal("id", id),
+            Query.limit(1),
+        ])
+        .then((response) => response.documents?.[0]);
+}
 
-    componentDidMount() {
-        //FIXME: load tmdb information
-        this.getMovie().then((result) => this.setState({ movie: result }));
-    }
+export default function Series() {
+    const [play, setPlay] = useState(false);
+    const [movie, setMovie] = useState<Awaited<ReturnType<typeof getMovie>>>();
+    const { id } = useParams<{ id: string }>();
 
-    getMovie() {
-        return databases
-            .listDocuments(databaseId, collectionIds.movies, [
-                Query.equal("id", this.props.match.params.id),
-                Query.limit(1)
-            ])
-            .then((response) => response.documents?.[0]);
-    }
+    useEffect(() => {
+        if (id === undefined) {
+            return;
+        }
 
-    render() {
-        const video = [this.state.movie?.videos ?? []].flat()[0];
+        getMovie(id).then((result) => setMovie(result));
+    }, [id]);
 
-        return this.state.play ? (
-            <Video VIDEO_ID={video?.ytid} />
-        ) : (
-            <button onClick={() => this.setState({ play: true })}>Play</button>
-        );
-    }
+    const video = [movie?.videos ?? []].flat()[0];
+
+    return play ? (
+        <Video VIDEO_ID={video?.ytid} />
+    ) : (
+        <button onClick={() => setPlay(true)}>Play</button>
+    );
 }
