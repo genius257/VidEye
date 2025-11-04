@@ -2,7 +2,7 @@ import React, {
     CSSProperties,
     /*MouseEvent,*/ useCallback,
     useRef,
-    useState
+    useState,
 } from "react";
 import "./Poster.css";
 import ContextMenu, { ContextMenuItem } from "../contextMenu";
@@ -47,7 +47,7 @@ export default function Poster({ title, image, marked }: PosterProps) {
                     <ContextMenuItem>Something else</ContextMenuItem>
                 </>,
                 e.pageX,
-                e.pageY
+                e.pageY,
             );
 
             //this.root.style.display = "absolute";
@@ -70,7 +70,7 @@ export default function Poster({ title, image, marked }: PosterProps) {
 
             //console.log("onContextMenu");
         },
-        []
+        [],
     );
 
     var className = ["poster", marked ? "marked" : ""]
@@ -84,7 +84,7 @@ export default function Poster({ title, image, marked }: PosterProps) {
             style={
                 {
                     backgroundImage: image,
-                    "--card-progress": progress
+                    "--card-progress": progress,
                 } as CSSProperties
             }
             onContextMenu={contextMenuCallback}
