@@ -55,6 +55,11 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build
         run: ${{ steps.detect-package-manager.outputs.manager }} run build
+        env:
+          VITE_APP_TMDB_API_KEY: ${{ vars.VITE_APP_TMDB_API_KEY }}
+          VITE_APP_APPWRITE_PROJECT_ID: ${{ vars.VITE_APP_APPWRITE_PROJECT_ID }}
+          VITE_APP_APPWRITE_ENDPOINT: ${{ vars.VITE_APP_APPWRITE_ENDPOINT }}
+          VITE_APP_APPWRITE_DATABASE_HISTORY: ${{ vars.VITE_APP_APPWRITE_DATABASE_HISTORY }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
