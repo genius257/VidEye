@@ -59,20 +59,17 @@ export default function Me() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const parsedUrls = parseUrls(urls);
-        const newEntries: VideoEntry[] = [];
 
         Promise.all(
-            parsedUrls.map((oUrl) =>
-                fetchVideoInfo(oUrl.url).then((info) => {
-                    newEntries.push({
-                        ytid: oUrl.id,
-                        url: oUrl.url,
-                        title: info.title ?? "Unknown",
-                        type: "movie", // Default to movie
-                    });
-                }),
+            parsedUrls.map<Promise<VideoEntry>>((oUrl) =>
+                fetchVideoInfo(oUrl.url).then((info) => ({
+                    ytid: oUrl.id,
+                    url: oUrl.url,
+                    title: info.title ?? "Unknown",
+                    type: "movie", // Default to movie
+                })),
             ),
-        ).then(() => {
+        ).then((newEntries) => {
             setVideoEntries([...videoEntries, ...newEntries]);
             setUrls("");
         });
