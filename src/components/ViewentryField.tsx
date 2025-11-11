@@ -35,15 +35,17 @@ export type VideoEntry = {
 export type ViewentryFieldProps = {
     ytid: string;
     onValueChange?: (value: VideoEntry) => void;
-} & HTMLProps<HTMLDivElement>;
+    value?: VideoEntry;
+} & Omit<HTMLProps<HTMLDivElement>, "value">;
 
 export default function ViewentryField({
     ytid,
     onValueChange,
+    value,
     ...props
 }: ViewentryFieldProps) {
     const [videoInfo, setVideoInfo] = useState<Partial<VideoEntry>>({
-        title: "",
+        title: value?.title ?? "",
         ytid,
         type: "movie",
     });

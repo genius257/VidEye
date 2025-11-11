@@ -194,6 +194,7 @@ export default function Me() {
                                 ytid={entry.ytid}
                                 key={index}
                                 className="space-y-4"
+                                value={entry}
                                 onValueChange={(value) => {
                                     setVideoEntries(
                                         videoEntries.toSpliced(index, 1, value),
