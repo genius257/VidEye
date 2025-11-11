@@ -1,5 +1,17 @@
+import { ComponentProps } from "react";
 import Poster from "./Poster";
 
-export default function TmdbPoster({ image }: { image: string }) {
-    return <Poster image={`https://image.tmdb.org/t/p/w300/${image.trim()}`} />;
+type Props = ComponentProps<typeof Poster> & { image?: string };
+
+export default function TmdbPoster({ image, ...props }: Props) {
+    return (
+        <Poster
+            image={
+                image !== undefined
+                    ? `url('https://image.tmdb.org/t/p/w300/${image.trim()}')`
+                    : undefined
+            }
+            {...props}
+        />
+    );
 }
