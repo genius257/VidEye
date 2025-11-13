@@ -12,6 +12,7 @@
     "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
     "@tanstack/react-query": "^5.90.8",
+    "@uidotdev/usehooks": "^2.4.1",
     "@vitejs/plugin-react": "^4.3.3",
     "appwrite": "^16.0.2",
     "blueimp-md5": "^2.19.0",
