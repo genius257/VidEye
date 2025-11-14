@@ -14,8 +14,22 @@ import {
 } from "./ui/select";
 import { collectionIds, databases } from "@/appwrite";
 import { Input } from "./ui/input";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "./ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/button";
 // import { Button } from "./ui/button";
 // import { Cross, Plus, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Query } from "appwrite";
+import { useDebounce } from "@uidotdev/usehooks";
 
 type VideoType = "movie" | "series";
 
@@ -54,6 +68,42 @@ export default function ViewentryField({
     const [seriesData, setSeriesData] = useState<TvShowDetails | null>(null);
     const [seasonData, setSeasonData] = useState<SeasonDetails | null>(null);
     // const [movieData, setMovieData] = useState<MovieDetails | null>(null);
+    const [isSeriesDropdownVisible, setSeriesDropdownVisible] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const debouncedSearchTerm = useDebounce(searchQuery, 300);
+    const searchQueryResult = useQuery({
+        queryKey: [
+            "contentSectionSearch",
+            videoInfo.type,
+            debouncedSearchTerm,
+            isSeriesDropdownVisible,
+        ],
+        refetchOnWindowFocus: false,
+        queryFn: () => {
+            if (videoInfo.type === undefined || !isSeriesDropdownVisible) {
+                return [];
+            }
+
+            const collectionId =
+                videoInfo.type === "movie"
+                    ? collectionIds.movies
+                    : collectionIds.series;
+
+            return databases
+                .listDocuments<Series | Movie>(
+                    "671eb9f3000ca1862380",
+                    collectionId,
+                    [
+                        Query.limit(10),
+                        ...(debouncedSearchTerm.trim() !== ""
+                            ? [Query.contains("title", debouncedSearchTerm)]
+                            : []),
+                    ],
+                )
+                .then((response) => response.documents);
+        },
+    });
 
     useEffect(() => {
         if (onValueChange) {
@@ -158,41 +208,60 @@ export default function ViewentryField({
             </RadioGroup>
             {videoInfo.type === "series" && (
                 <div className="space-y-2">
-                    <Select
-                        value={videoInfo.series?.$id}
-                        onValueChange={(value) =>
-                            setVideoInfo({
-                                ...videoInfo,
-                                series: series.find((s) => s.$id === value),
-                                season: undefined,
-                                episode: undefined,
-                            })
-                        }
+                    <Popover
+                        open={isSeriesDropdownVisible}
+                        onOpenChange={(open) => setSeriesDropdownVisible(open)}
                     >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select Series" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {series.map((s) => (
-                                <SelectItem key={s.$id} value={s.$id}>
-                                    {s.title}
-                                </SelectItem>
-                            ))}
-                            <SelectItem value="__new__">
-                                + Add New Series
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                    {/*entry.series?.title === "__new__" && (
-                                    <Input
-                                        placeholder="New Series Name"
-                                        onChange={(e) =>
-                                            updateEntry(index, {
-                                                series: e.target.value
-                                            })
-                                        }
-                                    />
-                                )*/}
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={isSeriesDropdownVisible}
+                                className="justify-between w-full"
+                            >
+                                {videoInfo.series?.title ?? "Select series..."}
+                                <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                            <Command>
+                                <CommandInput
+                                    placeholder="Search series..."
+                                    value={searchQuery}
+                                    onValueChange={(value) =>
+                                        setSearchQuery(value)
+                                    }
+                                ></CommandInput>
+                                <CommandList>
+                                    <CommandEmpty></CommandEmpty>
+                                    <CommandGroup>
+                                        {searchQueryResult.data?.map((s) => (
+                                            <CommandItem
+                                                key={s.$id}
+                                                value={s.title}
+                                                onSelect={() =>
+                                                    setVideoInfo({
+                                                        ...videoInfo,
+                                                        series: series.find(
+                                                            (_s) =>
+                                                                s.$id ===
+                                                                _s.$id,
+                                                        ),
+                                                        season: undefined,
+                                                        episode: undefined,
+                                                    })
+                                                }
+                                            >
+                                                {videoInfo.series?.$id ===
+                                                    s.$id && <Check />}
+                                                {s.title}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
                     <div className="flex space-x-2">
                         <Select
                             disabled={videoInfo.series === undefined}
