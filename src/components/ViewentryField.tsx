@@ -1,8 +1,13 @@
 import { tmdb } from "@/tmdb";
 import { Series, Movie } from "@/types/models";
 import Video from "@/views/video";
-import { HTMLProps, useEffect, useState } from "react";
-import { /*MovieDetails,*/ SeasonDetails, TvShowDetails } from "tmdb-ts";
+import { HTMLProps, useEffect, useMemo, useState } from "react";
+import {
+    /*MovieDetails,*/ SeasonDetails,
+    TV,
+    TvShowDetails,
+    Movie as TmdbMovie,
+} from "tmdb-ts";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import {
@@ -22,12 +27,19 @@ import {
     CommandItem,
     CommandList,
 } from "./ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { Query } from "appwrite";
+import { ID, Query } from "appwrite";
 import { useDebounce } from "@uidotdev/usehooks";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "./ui/dialog";
 
 type VideoType = "movie" | "series";
 
@@ -66,6 +78,8 @@ export default function ViewentryField({
     const [seriesData, setSeriesData] = useState<TvShowDetails | null>(null);
     const [seasonData, setSeasonData] = useState<SeasonDetails | null>(null);
     // const [movieData, setMovieData] = useState<MovieDetails | null>(null);
+    const [isTmdbModalOpen, setTmdbModalOpen] = useState(false);
+    const [tmdbSearchQuery, setTmdbSearchQuery] = useState("");
     const [isSeriesDropdownVisible, setSeriesDropdownVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -102,6 +116,64 @@ export default function ViewentryField({
                 .then((response) => response.documents);
         },
     });
+
+    const debouncedTmdbSearchQuery = useDebounce(tmdbSearchQuery, 300);
+    const tmdbQueryResult = useQuery({
+        queryKey: ["TMDB search", videoInfo.type, debouncedTmdbSearchQuery],
+        refetchOnReconnect: false,
+        queryFn: () => {
+            if (videoInfo.type === undefined) {
+                return [];
+            }
+
+            return tmdb.search[
+                videoInfo.type === "movie" ? "movies" : "tvShows"
+            ]({
+                query: debouncedTmdbSearchQuery,
+                include_adult: true,
+            }).then((response) => response.results);
+        },
+    });
+    const addSeriesFromTMDB = (value: TmdbMovie | TV) => {
+        if (videoInfo.type === undefined) {
+            return;
+        }
+        //Create new db entry
+        databases
+            .createDocument(
+                "671eb9f3000ca1862380",
+                videoInfo.type === "movie"
+                    ? collectionIds.movies
+                    : collectionIds.series,
+                ID.unique(),
+                videoInfo.type === "movie"
+                    ? ({
+                          title: (value as TmdbMovie).title,
+                          tmdb_id: value.id.toString(),
+                          poster: value.poster_path,
+                          created_at: "",
+                      } satisfies Partial<Movie>)
+                    : ({
+                          title: (value as TV).name,
+                          tmdb_id: value.id.toString(),
+                          poster: value.poster_path,
+                          created_at: "",
+                      } satisfies Partial<Series>),
+            )
+            .then((result) => {
+                //FIXME: currently this does not handle movie creation!
+                setVideoInfo({
+                    ...videoInfo,
+                    series: result as Series,
+                    season: undefined,
+                    episode: undefined,
+                });
+            });
+
+        setTmdbModalOpen(false);
+        setTmdbSearchQuery("");
+        setSeriesDropdownVisible(false);
+    };
 
     useEffect(() => {
         if (onValueChange) {
@@ -231,7 +303,27 @@ export default function ViewentryField({
                                     }
                                 ></CommandInput>
                                 <CommandList>
-                                    <CommandEmpty></CommandEmpty>
+                                    <CommandEmpty>
+                                        <div className="p-2 text-center text-sm">
+                                            <p className="text-muted-foreground mb-2">
+                                                No series found
+                                            </p>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => {
+                                                    setTmdbModalOpen(true);
+                                                    setSeriesDropdownVisible(
+                                                        false,
+                                                    );
+                                                }}
+                                                className="w-full"
+                                            >
+                                                <Plus className="mr-2 h-4 w-4" />
+                                                Add new series from TMDB
+                                            </Button>
+                                        </div>
+                                    </CommandEmpty>
                                     <CommandGroup>
                                         {searchQueryResult.data?.map((s) => (
                                             <CommandItem
@@ -327,6 +419,81 @@ export default function ViewentryField({
                     </div>
                 </div>
             )}
+            <Dialog open={isTmdbModalOpen} onOpenChange={setTmdbModalOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Search TheMovieDB</DialogTitle>
+                        <DialogDescription>
+                            Search for a {videoInfo.type} to add to your
+                            platform
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                        <Input
+                            placeholder="Search for series..."
+                            value={tmdbSearchQuery}
+                            onChange={(e) => setTmdbSearchQuery(e.target.value)}
+                        />
+                        {tmdbQueryResult.isLoading && (
+                            <div className="text-center py-8 text-muted-foreground">
+                                Searching...
+                            </div>
+                        )}
+                        {!tmdbQueryResult.isLoading &&
+                            (tmdbQueryResult.data?.length ?? 0) === 0 &&
+                            tmdbSearchQuery && (
+                                <div className="text-center py-8 text-muted-foreground">
+                                    No results found
+                                </div>
+                            )}
+                        {!tmdbQueryResult.isLoading &&
+                            (tmdbQueryResult.data?.length ?? 0) > 0 && (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    {tmdbQueryResult.data?.map((result) => {
+                                        const title =
+                                            "name" in result
+                                                ? result.name
+                                                : result.title;
+                                        const date =
+                                            "release_date" in result
+                                                ? result.release_date
+                                                : result.first_air_date;
+                                        return (
+                                            <button
+                                                key={result.id}
+                                                onClick={() =>
+                                                    addSeriesFromTMDB(result)
+                                                }
+                                                className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-accent transition-colors"
+                                            >
+                                                <img
+                                                    src={`https://image.tmdb.org/t/p/w300/${
+                                                        result.poster_path ||
+                                                        "/placeholder.svg"
+                                                    }`}
+                                                    alt={title}
+                                                    className="w-full aspect-[2/3] object-cover rounded-md"
+                                                />
+                                                <div className="text-center">
+                                                    <p className="text-sm font-medium line-clamp-2">
+                                                        {title}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {date !== ""
+                                                            ? new Date(
+                                                                  date,
+                                                              ).getFullYear()
+                                                            : null}
+                                                    </p>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
