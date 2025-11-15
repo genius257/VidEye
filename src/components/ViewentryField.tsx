@@ -301,7 +301,7 @@ export default function ViewentryField({
                                     onValueChange={(value) =>
                                         setSearchQuery(value)
                                     }
-                                ></CommandInput>
+                                />
                                 <CommandList>
                                     <CommandEmpty>
                                         <div className="p-2 text-center text-sm">
