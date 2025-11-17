@@ -1,5 +1,5 @@
 import { tmdb } from "@/tmdb";
-import { Series, Movie } from "@/types/models";
+import { Series, Movie, Season } from "@/types/models";
 import Video from "@/views/video";
 import { HTMLProps, useEffect, useMemo, useState } from "react";
 import {
@@ -359,13 +359,51 @@ export default function ViewentryField({
                         <Select
                             disabled={videoInfo.series === undefined}
                             value={videoInfo.season ?? ""}
-                            onValueChange={(e) =>
+                            onValueChange={(e) => {
+                                if (
+                                    videoInfo.series?.seasons?.find(
+                                        (entry) => entry.season === parseInt(e),
+                                    ) === undefined
+                                ) {
+                                    const season = seriesData?.seasons.find(
+                                        (_) => _.season_number.toString() === e,
+                                    );
+
+                                    if (season === undefined) {
+                                        console.error(
+                                            `Could not find expected season "${e}" for series "${seriesData?.name}"`,
+                                        );
+                                    } else {
+                                        databases
+                                            .createDocument(
+                                                "671eb9f3000ca1862380",
+                                                collectionIds.seasons,
+                                                ID.unique(),
+                                                {
+                                                    series: videoInfo.series
+                                                        .$id,
+                                                    season: season.season_number,
+                                                    poster:
+                                                        season.poster_path ??
+                                                        undefined,
+                                                    title: season.name,
+                                                    created_at: "",
+                                                } satisfies Partial<Season>,
+                                            )
+                                            .then((season) =>
+                                                videoInfo.series?.seasons?.push(
+                                                    season as Season,
+                                                ),
+                                            );
+                                    }
+                                }
+
                                 setVideoInfo({
                                     ...videoInfo,
                                     season: e,
                                     episode: undefined,
-                                })
-                            }
+                                });
+                            }}
                         >
                             <SelectTrigger>
                                 <SelectValue placeholder="Select Season" />
