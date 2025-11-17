@@ -62,6 +62,26 @@ export type ViewentryFieldProps = {
     value?: VideoEntry;
 } & Omit<HTMLProps<HTMLDivElement>, "value">;
 
+function extractSeasonEpisode(text: string) {
+    const seasonRegex = /(?:S|Season)\s*(\d+)/i;
+    const episodeRegex = /(?:E|Ep|Episode)\s*(\d+)/i;
+
+    let season = undefined;
+    let episode = undefined;
+
+    const seasonMatch = text.match(seasonRegex);
+    if (seasonMatch && seasonMatch[1]) {
+        season = parseInt(seasonMatch[1], 10);
+    }
+
+    const episodeMatch = text.match(episodeRegex);
+    if (episodeMatch && episodeMatch[1]) {
+        episode = parseInt(episodeMatch[1], 10);
+    }
+
+    return { season, episode };
+}
+
 export default function ViewentryField({
     ytid,
     onValueChange,
@@ -82,6 +102,16 @@ export default function ViewentryField({
     const [tmdbSearchQuery, setTmdbSearchQuery] = useState("");
     const [isSeriesDropdownVisible, setSeriesDropdownVisible] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const { season, episode } = useMemo(() => {
+        const title = value?.title;
+
+        if (title === undefined) {
+            return {season: undefined, episode: undefined};
+        }
+
+        return extractSeasonEpisode(title);
+    }, [value?.title]);
 
     const debouncedSearchTerm = useDebounce(searchQuery, 300);
     const searchQueryResult = useQuery({
@@ -200,6 +230,60 @@ export default function ViewentryField({
                 break;
         }
     }, [videoInfo.type]);
+
+    useEffect(() => {
+        if (videoInfo.series === undefined) {
+            return;
+        }
+
+        if (seriesData?.seasons === undefined) {
+            return;
+        }
+
+        if (season === undefined) {
+            return;
+        }
+
+        if (
+            videoInfo.series?.seasons?.find(
+                (entry) => entry.season === season,
+            ) === undefined
+        ) {
+            return;
+        }
+
+        setVideoInfo({
+            ...videoInfo,
+            season: season.toString(),
+        });
+    }, [videoInfo.series, seriesData?.seasons]);
+
+    useEffect(() => {
+        if (videoInfo.series === undefined) {
+            return;
+        }
+
+        if (seasonData?.episodes === undefined) {
+            return;
+        }
+
+        if (episode === undefined) {
+            return;
+        }
+
+        if (
+            videoInfo.series?.seasons
+                ?.find((entry) => entry.season === season)
+                ?.episodes?.some((entry) => entry.episode === episode)
+        ) {
+            return;
+        }
+
+        setVideoInfo({
+            ...videoInfo,
+            episode: episode.toString(),
+        });
+    }, [videoInfo.episode, seasonData?.episodes]);
 
     /*
     useEffect(() => {
