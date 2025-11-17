@@ -329,7 +329,10 @@ export default function ViewentryField({
                                             <CommandItem
                                                 key={s.$id}
                                                 value={s.title}
-                                                onSelect={() =>
+                                                onSelect={() => {
+                                                    setSeriesDropdownVisible(
+                                                        false,
+                                                    );
                                                     setVideoInfo({
                                                         ...videoInfo,
                                                         series: series.find(
@@ -339,8 +342,8 @@ export default function ViewentryField({
                                                         ),
                                                         season: undefined,
                                                         episode: undefined,
-                                                    })
-                                                }
+                                                    });
+                                                }}
                                             >
                                                 {videoInfo.series?.$id ===
                                                     s.$id && <Check />}
