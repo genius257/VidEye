@@ -236,6 +236,10 @@ export default function ViewentryField({
             return;
         }
 
+        if (videoInfo.season !== undefined) {
+            return;
+        }
+
         if (seriesData?.seasons === undefined) {
             return;
         }
@@ -260,6 +264,10 @@ export default function ViewentryField({
 
     useEffect(() => {
         if (videoInfo.series === undefined) {
+            return;
+        }
+
+        if (videoInfo.episode !== undefined) {
             return;
         }
 
