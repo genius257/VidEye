@@ -7,6 +7,7 @@ import Poster from "../components/Poster";
 import { databases } from "../appwrite";
 import { Query } from "appwrite";
 import { Series } from "@/types/models";
+import TmdbPoster from "@/components/TmdbPoster";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type DashboardState = {
@@ -189,7 +190,7 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                 to={`/series/${series.$id}/`}
                                 key={series.$id}
                             >
-                                <Poster
+                                <TmdbPoster
                                     marked={
                                         !this.state.history?.some((entry) =>
                                             [
@@ -211,9 +212,9 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                                         )
                                     }
                                     image={
-                                        "url('https://image.tmdb.org/t/p/w300/" +
-                                        series.poster +
-                                        "')"
+                                        series.poster !== null
+                                            ? series.poster
+                                            : undefined
                                     }
                                     title={series.title}
                                 />
