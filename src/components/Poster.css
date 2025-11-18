@@ -1,22 +1,5 @@
 .poster {
-  /* calculate height to preserve a 4:3 aspect ratio */
-  --poster-final-width: var(--poster-width, 127px);
-  --poster-final-height: calc(var(--poster-final-width) * (4 / 3));
-  --poster-final-height: calc(var(--poster-final-width) * 1.5);
-
-  position: relative;
-  width: var(--poster-final-width);
-  height: var(--poster-final-height);
-  background-size: var(--poster-final-width) 191px;
-
   background-color: rgba(0, 0, 0, 0.3);
-
-  /*background-image: url("https://www.themoviedb.org/t/p/original/b4gYVcl8pParX8AjkN90iQrWrWO.jpg");*/
-  background-size: contain;
-  background-size: cover;
-  /*background-size: 100%;*/
-  background-position: center;
-  background-repeat: no-repeat;
 }
 
 .poster.marked::before {

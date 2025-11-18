@@ -73,7 +73,11 @@ export default function Poster({ title, image, marked }: PosterProps) {
         [],
     );
 
-    var className = ["poster", marked ? "marked" : ""]
+    var className = [
+        "poster",
+        marked ? "marked" : "",
+        "w-52 h-80 relative bg-cover bg-center bg-no-repeat",
+    ]
         .filter((v) => v)
         .join(" ");
 
