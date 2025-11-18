@@ -11,6 +11,7 @@ import Me from "./views/me";
 import ContextMenu from "./contextMenu";
 import Avatar from "./components/Avatar";
 import { UserProvider } from "./appwrite/context/user";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // https://dribbble.com/shots/7061489-Netflix-Homepage-Redesign-Concept
 // https://dribbble.com/shots/4361663-Netflix-Redesign
@@ -72,47 +73,58 @@ import { UserProvider } from "./appwrite/context/user";
 
 //Object.prototype.map = f => console.log(this)||Object.keys(this).map(key => f.call(null, key, this[key]));
 
+const queryClient = new QueryClient();
+
 export default class App extends React.Component {
     render() {
         return (
-            <div className="App h-screen flex flex-col">
-                <HashRouter>
-                    <header className="bg-red-600 flex flex-row justify-between content-center">
-                        <Link
-                            to="/"
-                            className="flex justify-center items-center p-2"
-                        >
-                            <i className="material-icons text-5xl">
-                                play_circle_filled
-                            </i>
-                        </Link>
-                        <Link
-                            to="/me/"
-                            className="flex justify-center items-center p-2"
-                        >
-                            <UserProvider>
-                                <Avatar />
-                            </UserProvider>
-                        </Link>
-                    </header>
-                    <UserProvider>
-                        <Routes>
-                            <Route index path="/" element={<DashboardView />} />
-                            <Route
-                                path="/series/:id/:season?/:episode?/"
-                                element={<SeriesView />}
-                            />
-                            <Route
-                                path="/movies/:id/"
-                                element={<MoviesView />}
-                            />
-                            <Route path="/watch/:id/" element={<WatchView />} />
-                            <Route path="/me/" element={<Me />} />
-                        </Routes>
-                    </UserProvider>
-                </HashRouter>
-                <ContextMenu />
-            </div>
+            <QueryClientProvider client={queryClient}>
+                <div className="App h-screen flex flex-col">
+                    <HashRouter>
+                        <header className="bg-red-600 flex flex-row justify-between content-center">
+                            <Link
+                                to="/"
+                                className="flex justify-center items-center p-2"
+                            >
+                                <i className="material-icons text-5xl">
+                                    play_circle_filled
+                                </i>
+                            </Link>
+                            <Link
+                                to="/me/"
+                                className="flex justify-center items-center p-2"
+                            >
+                                <UserProvider>
+                                    <Avatar />
+                                </UserProvider>
+                            </Link>
+                        </header>
+                        <UserProvider>
+                            <Routes>
+                                <Route
+                                    index
+                                    path="/"
+                                    element={<DashboardView />}
+                                />
+                                <Route
+                                    path="/series/:id/:season?/:episode?/"
+                                    element={<SeriesView />}
+                                />
+                                <Route
+                                    path="/movies/:id/"
+                                    element={<MoviesView />}
+                                />
+                                <Route
+                                    path="/watch/:id/"
+                                    element={<WatchView />}
+                                />
+                                <Route path="/me/" element={<Me />} />
+                            </Routes>
+                        </UserProvider>
+                    </HashRouter>
+                    <ContextMenu />
+                </div>
+            </QueryClientProvider>
         );
     }
 }
