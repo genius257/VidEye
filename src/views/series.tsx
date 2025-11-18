@@ -97,7 +97,7 @@ export default function () {
 
     if (episode === undefined) {
         return (
-            <div className="container flex flex-wrap flex-col gap-4 container mx-auto p-4">
+            <div className="container flex flex-wrap flex-col gap-4 mx-auto p-4">
                 <div>
                     <Poster
                         image={`url('https://image.tmdb.org/t/p/w300/${seasondata?.poster}')`}
