@@ -4,10 +4,10 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import Video from "./video";
 //import History from "../history";
 import Card from "../card";
-import Poster from "../components/Poster";
 import { collectionIds, databases } from "../appwrite";
 import { Models, Query } from "appwrite";
 import { Season, Series } from "../types/models";
+import TmdbPoster from "@/components/TmdbPoster";
 
 type SeriesState = {
     seasons: Season[] | {};
@@ -78,7 +78,7 @@ export default function () {
                 <div className="horizontal-list">
                     {series?.seasons?.map((season) => (
                         <Link to={`./${season.$id}/`} key={season.$id}>
-                            <Poster
+                            <TmdbPoster
                                 /*marked={History.isUnwatched(
                                     this.state.series?.id,
                                     season.id,
@@ -86,7 +86,7 @@ export default function () {
                                     this.state.series
                                         ?.seasons
                                 )}*/
-                                image={`url('https://image.tmdb.org/t/p/w300/${season.poster}')`}
+                                image={season.poster}
                             />
                         </Link>
                     ))}
@@ -99,9 +99,7 @@ export default function () {
         return (
             <div className="container flex flex-wrap flex-col gap-4 mx-auto p-4">
                 <div>
-                    <Poster
-                        image={`url('https://image.tmdb.org/t/p/w300/${seasondata?.poster}')`}
-                    />
+                    <TmdbPoster image={seasondata?.poster} />
                 </div>
                 <div className="flex flex-row flex-wrap gap-4">
                     {(
