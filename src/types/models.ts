@@ -9,7 +9,7 @@ export interface Movie extends WithoutIndexSignature<Models.Document> {
     deleted_at: Datetime;
     poster: Url;
     video: Video;
-    //tmdb_id: string;
+    tmdb_id: string;
 }
 
 export type Datetime = string;//FIXME
