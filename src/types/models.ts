@@ -25,7 +25,7 @@ export interface Series extends WithoutIndexSignature<Models.Document> {
 export type Url = string;//FIXME
 
 export interface Season extends WithoutIndexSignature<Models.Document> {
-    series: Array<Series>;
+    series: Series;
     poster: Url;
     created_at: Datetime;
     title: string;
