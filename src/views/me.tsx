@@ -174,7 +174,10 @@ export default function Me() {
             >
                 <div className="mt-8 space-y-6">
                     {videoEntries.map((entry, index) => (
-                        <div className="border p-4 rounded-md space-y-4">
+                        <div
+                            className="border p-4 rounded-md space-y-4"
+                            key={entry.ytid}
+                        >
                             <div className="flex space-x-2 justify-end">
                                 <Button
                                     size={"icon"}
