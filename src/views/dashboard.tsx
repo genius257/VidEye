@@ -7,6 +7,7 @@ import Poster from "../components/Poster";
 import { databases } from "../appwrite";
 import { Query } from "appwrite";
 import { Series } from "@/types/models";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type DashboardState = {
     series: Awaited<ReturnType<Dashboard["getSeries"]>>;
@@ -174,38 +175,51 @@ export default class Dashboard extends React.Component<{}, DashboardState> {
                 ) : null}
                 <h2>Recently added shows</h2>
                 <div className="horizontal-list">
-                    {this.state.series.map((series) => (
-                        <Link to={`/series/${series.$id}/`} key={series.$id}>
-                            <Poster
-                                marked={
-                                    !this.state.history?.some((entry) =>
-                                        [
-                                            [entry.videos ?? []].flat()?.[0]
-                                                ?.episodes ?? [],
-                                        ]
-                                            .flat()
-                                            .some(
-                                                (episode) =>
-                                                    [
+                    {this.state.series.length === 0 ? (
+                        <>
+                            <Skeleton className="w-52 h-80" />
+                            <Skeleton className="w-52 h-80" />
+                            <Skeleton className="w-52 h-80" />
+                            <Skeleton className="w-52 h-80" />
+                            <Skeleton className="w-52 h-80" />
+                        </>
+                    ) : (
+                        this.state.series.map((series) => (
+                            <Link
+                                to={`/series/${series.$id}/`}
+                                key={series.$id}
+                            >
+                                <Poster
+                                    marked={
+                                        !this.state.history?.some((entry) =>
+                                            [
+                                                [entry.videos ?? []].flat()?.[0]
+                                                    ?.episodes ?? [],
+                                            ]
+                                                .flat()
+                                                .some(
+                                                    (episode) =>
                                                         [
-                                                            episode?.seasons ??
-                                                                [],
-                                                        ].flat()?.[0]?.series ??
-                                                            [],
-                                                    ].flat()?.[0]?.id ===
-                                                    series.$id,
-                                            ),
-                                    )
-                                }
-                                image={
-                                    "url('https://image.tmdb.org/t/p/w300/" +
-                                    series.poster +
-                                    "')"
-                                }
-                                title={series.title}
-                            />
-                        </Link>
-                    ))}
+                                                            [
+                                                                episode?.seasons ??
+                                                                    [],
+                                                            ].flat()?.[0]
+                                                                ?.series ?? [],
+                                                        ].flat()?.[0]?.id ===
+                                                        series.$id,
+                                                ),
+                                        )
+                                    }
+                                    image={
+                                        "url('https://image.tmdb.org/t/p/w300/" +
+                                        series.poster +
+                                        "')"
+                                    }
+                                    title={series.title}
+                                />
+                            </Link>
+                        ))
+                    )}
                 </div>
                 <h2>Recently added movies</h2>
                 <div className="horizontal-list">
