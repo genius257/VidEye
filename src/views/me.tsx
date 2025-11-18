@@ -185,7 +185,8 @@ export default function Me() {
                                     onClick={() =>
                                         setVideoEntries(
                                             videoEntries.filter(
-                                                (_, i) => i !== index,
+                                                (_entry) =>
+                                                    _entry.ytid !== entry.ytid,
                                             ),
                                         )
                                     }
